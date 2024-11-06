@@ -61,7 +61,7 @@ devtools::install_github("MonoTockyLab/TockyPrep")
 
 ## 4. Package Documentation
 
-The ** TockyPrep** package documentation is available online:
+The **TockyPrep** package documentation is available online:
 
 - **Website**: [https://MonoTockyLab.github.io/TockyPrep/](https://MonoTockyLab.github.io/TockyPrep/)
 
