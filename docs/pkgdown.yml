@@ -1,0 +1,9 @@
+pandoc: '3.2'
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  TockyDataPreprocessing: TockyDataPreprocessing.html
+last_built: 2024-11-06T15:45Z
+urls:
+  reference: https://MonoTockyLab.github.io/TockyPrep/reference
+  article: https://MonoTockyLab.github.io/TockyPrep/articles

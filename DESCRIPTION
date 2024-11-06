@@ -1,0 +1,17 @@
+Package: TockyPrep
+Version: 0.1.0
+Date: 2024-11-05
+Title: Data Preprocessing for Fluorescent Timer Reporters Using the Timer-Of-Cell-Kinetics-of-activitY (Tocky)
+Authors@R: c(person("Masahiro", "Ono", role = c("aut", "cre"),
+                     email = "monotockylab@gmail.com", comment = c(OCRID="0000-0002-9284-7326")))
+Author: Masahiro Ono [aut, cre]
+Maintainer: Masahiro Ono  <monotockylab@gmail.com>
+Description: This package provides data preprocessing methods for analyzing Fluorescent Timer data obtained by flow cytometry. Specifically, it provides the trigonometric transformation of Timer fluorescence to generate Timer Angle and Timer Intensity.
+Depends: R (>= 4.2.0), utils, stats, graphics, grDevices
+Suggests: knitr, rmarkdown, KernSmooth
+VignetteBuilder: knitr
+License: Apache License 2.0
+URL: https://github.com/MonoTockyLab/TockyPrep, https://MonoTockyLab.github.io/TockyPrep
+BugReports: https://github.com/MonoTockyLab/TockyPrep/issues
+Encoding: UTF-8
+RoxygenNote: 7.3.2

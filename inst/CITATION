@@ -1,0 +1,15 @@
+citHeader("To cite TockyPrep in publications use:")
+
+bibentry(
+  bibtype = "Manual",
+  title = "TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Timer Analysis",
+  author = person("Masahiro", "Ono"),
+  year = "2024",
+  note = "arXiv preprint arXiv:XXXX.YYYY [q-bio.QM]",
+  url = "https://arxiv.org/abs/XXXX.YYYY",
+  textVersion = paste(
+    "Masahiro Ono (2024). TockyPrep: Data Preprocessing Methods for Flow Cytometric",
+    " Fluorescent Timer Analysis. arXiv preprint arXiv:XXXX.YYYY [q-bio.QM].",
+    "Available at: https://arxiv.org/abs/XXXX.YYYY"
+  )
+)

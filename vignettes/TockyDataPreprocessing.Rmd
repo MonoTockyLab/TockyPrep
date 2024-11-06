@@ -1,0 +1,159 @@
+---
+title: "TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Timer Analysis"
+author: "Dr. Masahiro Ono"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+link-citations: TRUE
+vignette: >
+  %\VignetteIndexEntry{TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Timer Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, out.width = "60%", echo = FALSE}
+knitr::include_graphics('assets/bannar.jpg')
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+## TockyPrep: Standardizing the Analysis of Fluorescent Timer Proteins in Flow Cytometry
+
+Fluorescent Timer proteins uniquely change their emission spectra over time and serve as powerful tools for monitoring the dynamic processes within cells. These proteins are crucial for understanding the intricate temporal dynamics of cellular events. Despite their potential, the analysis of Timer fluorescence data in flow cytometry is often complicated by variability in instrument settings and the absence of standardized data preprocessing methods. To overcome these challenges, the **TockyPrep** package has been developed. This R package provides a comprehensive suite of tools designed to automate the preprocessing, normalization, and trigonometric transformation of Timer fluorescence data.
+
+## Aim
+
+The **TockyPrep** package aims to standardize the analysis of Timer fluorescence to improve reproducibility and accuracy across various experimental setups. It specifically addresses the normalization of immature and mature Timer fluorescence as a critical step for robust analysis. This approach is central to understanding the maturation dynamics of Timer proteins, and is implemented using advanced trigonometric transformations.
+
+```{r, out.width = "60%", echo = FALSE}
+knitr::include_graphics('assets/overview.jpg')
+```
+
+# Getting Started with TockyPrep
+
+To begin using **TockyPrep**, install the package from GitHub using the following command:
+
+```R
+# Install TockyPrep from GitHub
+devtools::install_github("MonoTockyLab/TockyPrep")
+```
+
+Once installed, you can load the package and follow the vignette's sample workflow to process your flow cytometry data. This vignette will guide you through importing your data, applying preprocessing steps, and visualizing the results to ensure that you can fully leverage the capabilities of the **TockyPrep** toolkit.
+
+# Sample Workflow
+
+This section will walk you through a typical analysis workflow using **TockyPrep** to process flow cytometric data of cells expressing Fluorescent Timer proteins. We will cover data import, application of preprocessing methods, and basic visualization techniques.
+
+## Set-up and `prep_tocky`
+
+To start the TockyPrep analysis, load the library.
+
+```{r tockyprep, include=FALSE}
+library(TockyPrep)
+```
+
+We will use example files included in the TockyPrep package. To access the files, run the following codes, which defines the sample files and the negative control file to be used.
+
+```{r prep, include=TRUE}
+# Example data load
+# Define the base path
+file_path <- system.file("extdata", package = "TockyPrep")
+
+# Define files
+negfile <- "Timer_negative.csv"
+samplefiles <- list.files(file_path, pattern = "sample_", full.names = FALSE)
+samplefiles <- setdiff(samplefiles, file.path(file_path, negfile))
+
+
+print(negfile)
+head(samplefiles)
+
+```
+
+We will define the files to be analyzed using the function `prep_tocky`.
+```{r prep_tocky, include=TRUE}
+# Preprocessing data
+prep <- prep_tocky(path = file_path, samplefile = samplefiles, negfile = negfile, interactive = FALSE)
+
+```
+
+
+## Data preprocessing by `timer_transform`
+
+Now we are ready to apply the data preprocessing methods to the sample data. `timer_transform` does all the steps, including the data import, Timer thresholding, Timer fluorescence normalization, and Trigonometric transformation to obtain Timer Angle and Intensity values for individual cells.
+
+```{r transform, include=TRUE}
+
+# Normalizing and transforming data
+transformed_data <- timer_transform(prep, blue_channel = 'Timer.Blue', red_channel = 'Timer.Red', select = FALSE, verbose = FALSE)
+```
+
+```{r, out.width = "30%", echo = FALSE}
+knitr::include_graphics('assets/Tocky_sapling.jpg')
+```
+
+## Visualization
+
+To effectively visualize the processed data, sample grouping needs to be defined using `sample_definition`. The example file `sampledefinition.csv` provides the standard form. Use data.frame as input into `sample_definition`.
+
+```{r sample_definition1, include=TRUE}
+sample_definition <- read.csv(file.path(file_path, 'sampledefinition.csv'))
+sample_definition <- as.data.frame(sample_definition)
+head(sample_definition)
+# Normalizing and transforming data
+
+transformed_data <- sample_definition(transformed_data, sample_definition = sample_definition, interactive = FALSE)
+
+```
+
+Alternatively, sample grouping can be created by choosing interaction session using the option `interactive = TRUE`. This will prompt generation of sample_definition.csv in your output directory.
+
+```{r sample_definition2, include=FALSE, }
+transformed_data <- sample_definition(transformed_data, output_dir = 'outuput', interactive = TRUE)
+
+```
+
+To visualize the processed Timer data, use `plot_tocky`. This is a versatile function, enabling the three plot modes, including `'Timer fluorescence'`, `'Normalized Timer fluorescence'`, and `'Timer Angle and Intensity'`.
+
+- `'Timer fluorescence'`: Timer blue and red fluorescence, without normalization.
+- `'Normalized Timer fluorescence'`: Normalized and thrsholded Timer blue and red fluorescence.
+- `'Timer Angle and Intensity'`: Timer Angle and Intensity after trigonometric transformation.
+
+The default is `'Timer fluorescence'`.
+
+```{r plot_tocky_timer_fluorescence, fig.width=4, fig.height=4}
+
+logic <- sample_definition$group %in% c(0, 4, 8, 12)
+samplefiles <- sample_definition$file[logic]
+# Visualizing the results
+plot_tocky(transformed_data, interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
+```
+
+Using the option `plot_mode = "Normalized Timer fluorescence"`, you can visualize Normalized Timer blue and red fluorescence.
+
+```{r plot_tocky_normalized, fig.width=4, fig.height=4}
+# Visualizing the results
+plot_tocky(transformed_data, plot_mode = "Normalized Timer fluorescence", interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
+```
+
+Using the option `plot_mode = "Timer Angle and Intensity"`, you can visualize the effects of the trigonometric transformation applied to the normalized data.
+
+```{r plot_tocky_Angle_Intensity, fig.width=4, fig.height=4}
+# Visualizing the results
+plot_tocky(transformed_data, plot_mode = "Timer Angle and Intensity", interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
+```
+
+
+```{r, out.width = "30%", echo = FALSE}
+knitr::include_graphics('assets/TockyPrep_logo.jpg')
+```
+
+
+```{r, out.width = "30%", echo = FALSE}
+knitr::include_graphics('assets/MonoLab.jpg')
+```
