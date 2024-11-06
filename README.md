@@ -1,21 +1,21 @@
 
 # TockyPrep: Data Preprocessing Methods for Fluorescent Timer Reporter Data
 
-<img src="vignettes/assets/bannar.jpg" align="center"   width=60%>
+
+<a href="https://monotockylab.github.io/TockyPrep/">
+
+<img src="vignettes/assets/bannar.jpg" align="center"   width=75%>
+</a>
+
 
 **Author:** Dr. Masahiro Ono  
 **Date:** 6 November 2024
 
-## Introduction
+## Introduction - The R Package for Fluorescent Timer Data Aalysis
 
 Fluorescent Timer proteins uniquely change their emission spectra over time and serve as powerful tools for monitoring the dynamic processes within cells. These proteins are crucial for understanding the intricate temporal dynamics of cellular events. Despite their potential, the analysis of Timer fluorescence data in flow cytometry is often complicated by variability in instrument settings and the absence of standardized data preprocessing methods. To overcome these challenges, the **TockyPrep** package has been developed. This R package provides a comprehensive suite of tools designed to automate the preprocessing, normalization, and trigonometric transformation of Timer fluorescence data.
 
 The **TockyPrep** package aims to standardize the analysis of Timer fluorescence to improve reproducibility and accuracy across various experimental setups. It specifically addresses the normalization of immature and mature Timer fluorescence as a critical step for robust analysis. This approach is central to understanding the maturation dynamics of Timer proteins, and is implemented using advanced trigonometric transformations.
-
-
-
-
-
 
 
 
@@ -67,7 +67,7 @@ The **TockyPrep** package documentation is available online:
 
 This site includes all the function reference manuals and vignettes (tutorials).
 
-In addition to the HTML manual pages, a PDF manual for the ** TockyPrep** package is available. You can find it in the installed package directory under `doc/`, or you can access it directly from [GitHub](https://github.com/MonoTockyLab/TockyPrep/blob/main/inst/doc/TockyPrep_0.1.0.pdf).
+In addition to the HTML manual pages, a PDF manual for the **TockyPrep** package is available. You can find it in the installed package directory under `doc/`, or you can access it directly from [GitHub](https://github.com/MonoTockyLab/TockyPrep/blob/main/inst/doc/TockyPrep_0.1.0.pdf).
 
 <br>
 
@@ -154,9 +154,6 @@ Tocky employs the Fluorescent Timer protein to analyze the temporal dynamics of 
 </a>
 
 **Professional Homepage**: [Imperial College London - Masahiro Ono](https://www.imperial.ac.uk/people/m.ono)
-
-
-
 
 <img src="vignettes/assets/Tocky_sapling.jpg" align="right"   width=30%>
 
