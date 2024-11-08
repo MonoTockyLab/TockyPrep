@@ -41,6 +41,7 @@ To begin using **TockyPrep**, install the package from GitHub using the followin
 ```R
 # Install TockyPrep from GitHub
 devtools::install_github("MonoTockyLab/TockyPrep")
+
 ```
 
 Once installed, you can load the package and follow the vignette's sample workflow to process your flow cytometry data. This vignette will guide you through importing your data, applying preprocessing steps, and visualizing the results to ensure that you can fully leverage the capabilities of the **TockyPrep** toolkit.
@@ -53,7 +54,7 @@ This section will walk you through a typical analysis workflow using **TockyPrep
 
 To start the TockyPrep analysis, load the library.
 
-```{r tockyprep, include=FALSE}
+```{r tockyprep, include=TRUE}
 library(TockyPrep)
 ```
 

@@ -127,10 +127,12 @@ techniques.</p>
 <h3 id="set-up-and-prep_tocky">Set-up and <code>prep_tocky</code><a class="anchor" aria-label="anchor" href="#set-up-and-prep_tocky"></a>
 </h3>
 <p>To start the TockyPrep analysis, load the library.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/MonoTockyLab/TockyPrep" class="external-link">TockyPrep</a></span><span class="op">)</span></span></code></pre></div>
 <p>We will use example files included in the TockyPrep package. To
 access the files, run the following codes, which defines the sample
 files and the negative control file to be used.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Example data load</span></span>
 <span><span class="co"># Define the base path</span></span>
 <span><span class="va">file_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"TockyPrep"</span><span class="op">)</span></span>
@@ -143,13 +145,13 @@ files and the negative control file to be used.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">negfile</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Timer_negative.csv"</span></span></code></pre>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">samplefiles</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "sample_0hrs_R1.csv"  "sample_0hrs_R2.csv"  "sample_0hrs_R3.csv" </span></span>
 <span><span class="co">## [4] "sample_12hrs_R1.csv" "sample_12hrs_R2.csv" "sample_12hrs_R3.csv"</span></span></code></pre>
 <p>We will define the files to be analyzed using the function
 <code>prep_tocky</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Preprocessing data</span></span>
 <span><span class="va">prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_tocky.html">prep_tocky</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">file_path</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, negfile <span class="op">=</span> <span class="va">negfile</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -161,7 +163,7 @@ sample data. <code>timer_transform</code> does all the steps, including
 the data import, Timer thresholding, Timer fluorescence normalization,
 and Trigonometric transformation to obtain Timer Angle and Intensity
 values for individual cells.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalizing and transforming data</span></span>
 <span><span class="va">transformed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timer_transform.html">timer_transform</a></span><span class="op">(</span><span class="va">prep</span>, blue_channel <span class="op">=</span> <span class="st">'Timer.Blue'</span>, red_channel <span class="op">=</span> <span class="st">'Timer.Red'</span>, select <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="assets%2FTocky_sapling.jpg" width="30%"></p>
@@ -173,7 +175,7 @@ values for individual cells.</p>
 be defined using <code>sample_definition</code>. The example file
 <code>sampledefinition.csv</code> provides the standard form. Use
 data.frame as input into <code>sample_definition</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sample_definition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">file_path</span>, <span class="st">'sampledefinition.csv'</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sample_definition</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">sample_definition</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sample_definition</span><span class="op">)</span></span></code></pre></div>
@@ -184,7 +186,7 @@ data.frame as input into <code>sample_definition</code>.</p>
 <span><span class="co">## 4 sample_12hrs_R1.csv    12</span></span>
 <span><span class="co">## 5 sample_12hrs_R2.csv    12</span></span>
 <span><span class="co">## 6 sample_12hrs_R3.csv    12</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalizing and transforming data</span></span>
 <span></span>
 <span><span class="va">transformed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sample_definition.html">sample_definition</a></span><span class="op">(</span><span class="va">transformed_data</span>, sample_definition <span class="op">=</span> <span class="va">sample_definition</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
@@ -208,7 +210,7 @@ thrsholded Timer blue and red fluorescence.</li>
 after trigonometric transformation.</li>
 </ul>
 <p>The default is <code>'Timer fluorescence'</code>.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logic</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">12</span><span class="op">)</span></span>
 <span><span class="va">samplefiles</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">file</span><span class="op">[</span><span class="va">logic</span><span class="op">]</span></span>
 <span><span class="co"># Visualizing the results</span></span>
@@ -217,7 +219,7 @@ after trigonometric transformation.</li>
 <p>Using the option
 <code>plot_mode = "Normalized Timer fluorescence"</code>, you can
 visualize Normalized Timer blue and red fluorescence.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Normalized Timer fluorescence"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning in KernSmooth::bkde2D(x, bandwidth = bandwidth, gridsize = nbin, :</span></span>
@@ -228,7 +230,7 @@ visualize Normalized Timer blue and red fluorescence.</p>
 <code>plot_mode = "Timer Angle and Intensity"</code>, you can visualize
 the effects of the trigonometric transformation applied to the
 normalized data.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Timer Angle and Intensity"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="TockyDataPreprocessing_files/figure-html/plot_tocky_Angle_Intensity-1.png" width="384"></p>

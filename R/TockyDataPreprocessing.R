@@ -1,3 +1,55 @@
+#' A class representing a TockyPrepData object for output of timer_transform
+#'
+#' This class is designed to encapsulate and structure the output of the
+#' timer_transform function in the TockyPrep package. It organizes various
+#' outputs into a coherent structure, ensuring that all necessary data components
+#' are included and validated. This structure is particularly useful for downstream
+#' processing and analysis in related packages like TockyLocus and TockyBase.
+#'
+#' @slot transformed_data A data.frame containing transformed data.
+#' @slot cell_counts A data.frame containing counts of cells per sample.
+#' @slot sample_definition A data.frame containing metadata for each sample.
+#' @slot timer_fluorescence A list containing fluorescence timing data.
+#' @slot input A list of raw input data.
+#' @slot normalization_parameters A list of parameters used for data normalization.
+#'
+#' @keywords classes
+#' @export
+#' @importFrom methods setClass
+setClass(
+  "TockyPrepData",
+  slots = list(
+    transformed_data = "data.frame",
+    cell_counts = "data.frame",
+    sample_definition = "data.frame",
+    timer_fluorescence = "list",
+    input = "list",
+    normalization_parameters = "list"
+  ),
+  validity = function(object) {
+    problems <- NULL
+    if (!is.data.frame(object@transformed_data)) {
+      problems <- c(problems, "transformed_data must be a data.frame.")
+    }
+    if (!is.data.frame(object@cell_counts)) {
+      problems <- c(problems, "cell_counts must be a data.frame.")
+    }
+    if (!is.data.frame(object@sample_definition)) {
+      problems <- c(problems, "sample_definition must be a data.frame.")
+    }
+    if (!is.list(object@timer_fluorescence)) {
+      problems <- c(problems, "timer_fluorescence must be a list.")
+    }
+    if (!is.list(object@input)) {
+      problems <- c(problems, "input must be a list.")
+    }
+    if (!is.list(object@normalization_parameters)) {
+      problems <- c(problems, "normalization_parameters must be a list.")
+    }
+    if (length(problems) == 0) TRUE else problems
+  }
+)
+
 # Copyright 2024 Masahiro Ono
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -140,7 +192,7 @@ negfile = NULL, samplefile = NULL) {
 #' @param q Quantile value used for automatic Timer thresholds.
 #'        Default is 0.998.
 #'
-#' @return A list containing:
+#' @return The function returns a new TockyPrepData object containing:
 #'   \itemize{
 #'     \item \code{transformed_data}: Data frame with angle, intensity, and other variables.
 #'     \item \code{normalization_parameters}: List with normalization values and coefficients.
@@ -394,21 +446,10 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     group = rep("", length(sample_files)),
     stringsAsFactors = FALSE
     )
-    
-    common_output <- list(
-        transformed_data = result_all,
-        cell_counts = data.frame(
-            sample = names(cellcount_total),
-            cell_count = cellcount_total,
-            stringsAsFactors = FALSE
-        ),
-        sample_definition = sample_definition,
-        timer_fluorescence = list(blue_channel = blue_log_colname, red_channel = red_log_colname),
-        input = input_list
-    )
+
 
     if (normalization) {
-        normalization_details <- list(
+        normalization_parameters <- list(
             blue_added = blue_min_adjust,
             red_added = red_min_adjust,
             red_threshold = red_threshold,
@@ -422,19 +463,32 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
             blue_channel_normalized = blue_channel_normalized,
             red_channel_normalized = red_channel_normalized
         )
-        output_list <- c(common_output, list(normalization_parameters = normalization_details))
     } else {
-        normalization_details <- list(
+        normalization_parameters <- list(
             blue_added = blue_min_adjust,
             red_added = red_min_adjust,
             red_threshold = red_threshold,
             blue_threshold = blue_threshold
         )
-        output_list <- c(common_output, list(normalization_parameters = normalization_details))
-    }
-
+     }
     
-    return(output_list)
+    timer_fluorescence <- list(blue_channel = blue_log_colname, red_channel = red_log_colname)
+
+    cell_counts <- data.frame(
+            sample = names(cellcount_total),
+            cell_count = cellcount_total,
+            stringsAsFactors = FALSE
+        )
+    
+    output <- new("TockyPrepData",
+                  transformed_data = result_all,
+                  cell_counts = cell_counts,
+                  sample_definition = sample_definition,
+                  timer_fluorescence = timer_fluorescence,
+                  input = input_list,
+                  normalization_parameters = normalization_parameters)
+    
+    return(output)
 }
 
 # Copyright 2024 Masahiro Ono
@@ -455,7 +509,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 #' This function takes the output from `timer_transform`, specifically the `sample_definition` data frame,
 #' exports it to a CSV file for the user to edit group assignments, and then reads the updated file back into R.
 #'
-#' @param timer_transform_output A list object returned by `timer_transform`, containing `sample_definition`.
+#' @param timer_transform_output A TockyPrepData object returned by `timer_transform`, containing `sample_definition`.
 #' @param output_dir Character string specifying the directory to save the `sample_definition.csv` file.
 #'                   If `NULL`, the file is saved in the current working directory. Default is `NULL`.
 #' @param filename Character string specifying the name of the sample definition file. Default is `"sample_definition.csv"`.
@@ -466,7 +520,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 #'  to export a file for sample grouping and enable user to edit it and import. Defaults to `TRUE`.
 
 #'
-#' @return A data frame containing the updated sample definitions with user-assigned groupings.
+#' @return An updated TockyPrepData with user-assigned groupings.
 #' @export
 #'
 #' @examples
@@ -482,10 +536,12 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 sample_definition <- function(timer_transform_output, sample_definition = NULL, output_dir = NULL, filename = "sample_definition.csv",
                               sep = ",", verbose = TRUE, interactive = FALSE) {
                                   
-                                  
+  if(!inherits(timer_transform_output, "TockyPrepData")){
+      stop("Use the output of timer_transform. \n")
+  }
   
   if(interactive){
-      sn <- timer_transform_output$sample_definition
+      sn <- timer_transform_output@sample_definition
       
       if (!is.null(output_dir)) {
         if (!dir.exists(output_dir)) {
@@ -506,7 +562,7 @@ sample_definition <- function(timer_transform_output, sample_definition = NULL, 
       readline(prompt = "Press [Enter] when you have edited the group clumn updated the sample definition file and saved it.")
       
       sn_updated <- read.table(output_file, sep = sep, header = TRUE, stringsAsFactors = FALSE)
-      timer_transform_output$sample_definition <- sn_updated
+      timer_transform_output@sample_definition <- sn_updated
       
       if (verbose) {
         message("Updated sample definition has been read.")
@@ -514,7 +570,7 @@ sample_definition <- function(timer_transform_output, sample_definition = NULL, 
   }else{
       if(!is.null(sample_definition)){
           if(is.data.frame(sample_definition)){
-              timer_transform_output$sample_definition <- sample_definition
+              timer_transform_output@sample_definition <- sample_definition
           }else{
               stop("Use data frame for sample_definition data. \n")
           }
