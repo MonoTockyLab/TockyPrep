@@ -60,7 +60,7 @@
                         <h4 data-toc-skip class="author">Dr. Masahiro
 Ono</h4>
             
-            <h4 data-toc-skip class="date">2024-11-07</h4>
+            <h4 data-toc-skip class="date">2024-11-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/MonoTockyLab/TockyPrep/blob/HEAD/vignettes/TockyDataPreprocessing.Rmd" class="external-link"><code>vignettes/TockyDataPreprocessing.Rmd</code></a></small>
       <div class="d-none name"><code>TockyDataPreprocessing.Rmd</code></div>
@@ -68,7 +68,7 @@ Ono</h4>
 
     
     
-<p><img src="assets/bannar.jpg" width="60%"></p>
+<p><img src="assets%2Fbannar.jpg" width="60%"></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -98,7 +98,7 @@ normalization of immature and mature Timer fluorescence as a critical
 step for robust analysis. This approach is central to understanding the
 maturation dynamics of Timer proteins, and is implemented using advanced
 trigonometric transformations.</p>
-<p><img src="assets/overview.jpg" width="60%"></p>
+<p><img src="assets%2Foverview.jpg" width="60%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -164,7 +164,7 @@ values for individual cells.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalizing and transforming data</span></span>
 <span><span class="va">transformed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timer_transform.html">timer_transform</a></span><span class="op">(</span><span class="va">prep</span>, blue_channel <span class="op">=</span> <span class="st">'Timer.Blue'</span>, red_channel <span class="op">=</span> <span class="st">'Timer.Red'</span>, select <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="assets/Tocky_sapling.jpg" width="30%"></p>
+<p><img src="assets%2FTocky_sapling.jpg" width="30%"></p>
 </div>
 <div class="section level3">
 <h3 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
@@ -232,8 +232,8 @@ normalized data.</p>
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Timer Angle and Intensity"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="TockyDataPreprocessing_files/figure-html/plot_tocky_Angle_Intensity-1.png" width="384"></p>
-<p><img src="assets/TockyPrep_logo.jpg" width="30%"></p>
-<p><img src="assets/MonoLab.jpg" width="30%"></p>
+<p><img src="assets%2FTockyPrep_logo.jpg" width="30%"></p>
+<p><img src="assets%2FMonoLab.jpg" width="30%"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -247,7 +247,7 @@ normalized data.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
