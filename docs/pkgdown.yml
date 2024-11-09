@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   Introduction: Introduction.html
   TockyDataPreprocessing: TockyDataPreprocessing.html
-last_built: 2024-11-09T08:36Z
+last_built: 2024-11-09T08:40Z
 urls:
   reference: https://MonoTockyLab.github.io/TockyPrep/reference
   article: https://MonoTockyLab.github.io/TockyPrep/articles

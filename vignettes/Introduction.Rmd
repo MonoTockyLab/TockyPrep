@@ -49,7 +49,7 @@ The primary objective of the Tocky approach is to analyze the time-related infor
 
 To optimally utilize this temporal information in single-cell analysis, we have introduced a novel concept along with appropriate algorithms. These tools are designed to normalize and transform Timer fluorescence data into two key metrics: *Timer Angle* and *Timer Intensity*.
 
-![Timer Angle and Timer Intensity](assets/Angleconversion.jpg){ width=50% align="center"}
+![**Timer Angle and Timer Intensity**](assets/Angleconversion.jpg){ width=50% align="center"}
 
 *Timer Angle* is defined as the angle (in degrees, ranging from 0 to 90) measured from the Timer-Blue axis towards the Timer-Red axis. *Timer Intensity* represents the distance (or *norm*) from each cell to the origin (where Timer-Blue = Timer-Red = 0).
 
