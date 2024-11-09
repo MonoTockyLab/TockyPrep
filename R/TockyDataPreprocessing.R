@@ -14,18 +14,15 @@
 #' A class representing a TockyPrepData object for output of timer_transform
 #'
 #' This class is designed to encapsulate and structure the output of the
-#' timer_transform function in the TockyPrep package. It organizes various
-#' outputs into a coherent structure, ensuring that all necessary data components
-#' are included and validated. This structure is particularly useful for downstream
-#' processing and analysis in related packages like TockyLocus and TockyBase.
+#' timer_transform function in the TockyPrep package.
 #'
-#' @slot Data A data.frame containing transformed data.
+#' @slot Data A data.frame containing expression data.
 #' @slot cell_counts A data.frame containing counts of cells per sample.
-#' @slot sampledef A data.frame containing metadata for each sample.
-#' @slot timer_fluorescence A list containing fluorescence timing data.
-#' @slot input A list of raw input data.
+#' @slot sampledef A list including annotation data for sample grouping.
+#' @slot timer_fluorescence A list containing channel names for fluorescence timer data.
+#' @slot input A list of parameters used for creating TockyPrepData object.
 #' @slot normalization_parameters A list of parameters used for data normalization.
-#' @slot Tocky A list containing other Tocky-specific analysis features.
+#' @slot Tocky A list containing other Tocky-specific analysis data.
 #'
 #' @keywords classes
 #' @export
@@ -75,13 +72,13 @@ setClass(
 #' It ensures all specific slots are set up.
 #'
 #' @param .Object A TockyPrepData object to be initialized.
-#' @param Data A data.frame containing transformed data.
+#' @param Data A data.frame containing expression data.
 #' @param cell_counts A data.frame containing counts of cells per sample.
-#' @param sampledef A data.frame containing metadata for each sample.
-#' @param timer_fluorescence A list containing fluorescence timing data.
-#' @param input A list of raw input data.
+#' @param sampledef A list including annotation data for sample grouping.
+#' @param timer_fluorescence A list containing channel names for fluorescence timer data.
+#' @param input A list of parameters used for creating TockyPrepData object.
 #' @param normalization_parameters A list of parameters used for data normalization.
-#' @param Tocky A list containing other Tocky-specific analysis features.
+#' @param Tocky A list containing other Tocky-specific analysis data.
 #'
 #' @return A valid TockyPrepData that has been initialized with provided data.
 #' @keywords internal
@@ -230,8 +227,8 @@ negfile = NULL, samplefile = NULL) {
 
 #' Perform Timer Transformation on Flow Cytometry Data
 #'
-#' This function processes flow cytometry data by applying FSC correction, normalization,
-#' and trigonometric transformation to the Blue and Red fluorescence channels.
+#' This function processes flow cytometry data by applying Timer thrsholding, normalization,
+#' and trigonometric transformation to the Blue and Red fluorescence data.
 #'
 #' @param prep A list containing file paths and variables, typically the output from \code{\link{prep_tocky}}.
 #' @param blue_channel Character string specifying the Blue fluorescence channel name.
@@ -563,16 +560,16 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 
 #' Update sample definitions and group assignments
 #'
-#' This function takes the output from `timer_transform`, specifically the `sampledef` data frame,
+#' This function takes the output from `timer_transform`, specifically the `sample_definition` data frame,
 #' exports it to a CSV file for the user to edit group assignments, and then reads the updated file back into R.
 #'
-#' @param x A TockyPrepData object returned by `timer_transform`, containing `sampledef`.
+#' @param x A TockyPrepData object returned by `timer_transform`.
 #' @param output_dir Character string specifying the directory to save the `sampledef.csv` file.
 #'                   If `NULL`, the file is saved in the current working directory. Default is `NULL`.
 #' @param filename Character string specifying the name of the sample definition file. Default is `"sampledef.csv"`.
 #' @param sep Character string indicating the field separator used in the CSV file. Default is `","`.
 #' @param verbose Logical indicating whether to display messages. Default is `TRUE`.
-#' @param sample_definition (Optional) to use a data frame object as an input, specify the input object by this parameter. Defaul is `NULL`.
+#' @param sample_definition (Optional) to use a data frame object as an annotation data for sample grouping. Defaul is `NULL`.
 #' @param interactive Logical indicating whether to use an interactive session
 #'  to export a file for sample grouping and enable user to edit it and import. Defaults to `TRUE`.
 
@@ -582,8 +579,8 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 #'
 #' @examples
 #' \dontrun{
-#'   # Assuming `result` is the output from `timer_transform`
-#'   sample_def <- sampledef(result, output_dir = "output_directory")
+#'   # Assuming `x` is the output from `timer_transform`
+#'   x <- sampledef(x, output_dir = "output_directory")
 #'   # The function will pause, allowing you to edit the 'group' column in the CSV file.
 #'   # After editing and saving the file, press Enter in R to continue.
 #'   # The updated sample definitions will be returned as a data frame.
@@ -641,77 +638,3 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
   return(x)
 }
 
-
-#' Log-transform selected variables in a data frame
-#'
-#' This function applies a custom log10 transformation to selected variables in a data frame. It allows optional adjustment of the data before logging and removal of rows with zeros in the transformed variables.
-#'
-#' @param x A data frame containing the data to be log-transformed.
-#' @param columns Optional character vector specifying the names of the columns to be log-transformed. If \code{NULL}, the function will prompt the user to select columns interactively. Default is \code{NULL}.
-#' @param add_offset Logical value indicating whether to adjust the data before logging by subtracting the 1\% quantile and adding 1. This helps in handling negative values and zeros. Default is \code{TRUE}.
-#'
-#' @return A data frame with the selected variables log-transformed and combined with the remaining variables.
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # Create an example data frame
-#' df <- data.frame(
-#'   Var1 = rnorm(100, mean = 100, sd = 20),
-#'   Var2 = rnorm(100, mean = 50, sd = 10),
-#'   Var3 = rnorm(100, mean = 10, sd = 2)
-#' )
-#'
-#' # Log-transform Var1 and Var2 with adjustment
-#' df_logged <- log_data(df, columns = c("Var1", "Var2"), add_offset = TRUE)
-#'
-#' # Log-transform variables with interactive selection
-#' df_logged <- log_data(df)
-#' }
-#' @importFrom stats quantile
-
-
-log_data <- function(x, columns = NULL, add_offset = TRUE) {
-
-  if (!is.data.frame(x)) {
-    stop("Input 'x' should be a data frame.")
-  }
-  
-  LogSingleData <- function(x) {
-    x_log <- x
-    lg <- x_log > 1
-    x_log[lg] <- log10(x_log[lg])
-    x_log[!lg] <- 0
-    return(x_log)
-  }
-  
-  if (is.null(columns)) {
-    choices <- colnames(x)
-    columns <- utils::select.list(choices, graphics = TRUE, title = "Select variables to log-transform", multiple = TRUE)
-  }
-  
-  if (length(columns) == 0) {
-    stop("No columns selected for log transformation.")
-  }
-  
-  if (!all(columns %in% colnames(x))) {
-    missing_cols <- setdiff(columns, colnames(x))
-    stop("The following selected columns are not present in the data frame: ", paste(missing_cols, collapse = ", "))
-  }
-  
-  x_log <- x[, columns, drop = FALSE]
-  
-  for (col_name in columns) {
-    if (add_offset) {
-      adj_value <- -quantile(x_log[[col_name]], 0.01, na.rm = TRUE) + 1
-      x_log[[col_name]] <- LogSingleData(x_log[[col_name]] + adj_value)
-    } else {
-      x_log[[col_name]] <- LogSingleData(x_log[[col_name]])
-    }
-  }
-  
-  result <- x_log
-  result <- result[, colnames(x)]
-  
-  return(result)
-}

@@ -16,7 +16,7 @@
 #' This function visualizes either Timer fluorescence (Blue vs Red) or Timer dynamics
 #' by the Tocky method (Angle vs Intensity) based on the specified mode.
 #'
-#' @param x A TockyPrepData object returned by `timer_transform`, which sample grouping has been defined by `sampledef`.
+#' @param x A TockyPrepData object returned by `timer_transform`, which sample grouping has been defined by `sample_definition`.
 #' @param file File name.
 #' @param pseudocolour A logical argument for whether to use pseudocolour in plots.
 #' @param interactive Logical indicating whether to prompt the user to select plot_mode.
@@ -51,7 +51,7 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
     }
     
     if(length(x@sampledef$sampledef$file)==0){
-        stop("Use sampledef. \n")
+        stop("Use sample_definition function. \n")
     }
     
     if (!file.exists(output)) {
