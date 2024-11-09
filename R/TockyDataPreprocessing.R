@@ -25,7 +25,7 @@
 #' @slot timer_fluorescence A list containing fluorescence timing data.
 #' @slot input A list of raw input data.
 #' @slot normalization_parameters A list of parameters used for data normalization.
-#' @slot Tocky A list containing other Tocky-specific analysis features
+#' @slot Tocky A list containing other Tocky-specific analysis features.
 #'
 #' @keywords classes
 #' @export
@@ -61,28 +61,32 @@ setClass(
     if (!is.list(object@normalization_parameters)) {
       problems <- c(problems, "normalization_parameters must be a list.")
     }
+    if (!is.list(object@Tocky)) {
+      problems <- c(problems, "Tocky must be a list.")
+    }
     if (length(problems) == 0) TRUE else problems
   }
 )
 
+
 #' Initialize a TockyPrepData object
 #'
 #' This method initializes a TockyPrepData with specific data for flow cytometry analysis.
-#' It ensures all inherited and specific slots are set up.
+#' It ensures all specific slots are set up.
 #'
-#' @param .Object A TockyPrepData object to be initialized
+#' @param .Object A TockyPrepData object to be initialized.
 #' @param transformed_data A data.frame containing transformed data.
 #' @param cell_counts A data.frame containing counts of cells per sample.
 #' @param sample_definition A data.frame containing metadata for each sample.
 #' @param timer_fluorescence A list containing fluorescence timing data.
 #' @param input A list of raw input data.
 #' @param normalization_parameters A list of parameters used for data normalization.
-#' @param Tocky A list containing other Tocky-specific analysis features
+#' @param Tocky A list containing other Tocky-specific analysis features.
 #'
 #' @return A valid TockyPrepData that has been initialized with provided data.
-#' @export
 #' @keywords internal
-
+#' @importFrom methods initialize validObject
+#' @export
 setMethod("initialize", "TockyPrepData",
   function(.Object, transformed_data, cell_counts, sample_definition, timer_fluorescence, input, normalization_parameters, Tocky) {
     .Object@transformed_data <- transformed_data
@@ -95,9 +99,10 @@ setMethod("initialize", "TockyPrepData",
 
     validObject(.Object)
 
-     return(.Object)
+    return(.Object)
   }
 )
+
 
 #' Show method for the TockyPrepData class
 #'
@@ -107,11 +112,9 @@ setMethod("initialize", "TockyPrepData",
 #'
 #' @param object An object of the TockyPrepData class
 #' @export
-#' @method show TockyPrepData
-#' @importFrom methods setMethod
-#' @keywords methods internal
-
-show.TockyPrepData <- function(object) {
+#' @importFrom methods show
+#' @importFrom utils head
+setMethod("show", "TockyPrepData", function(object) {
     cat("TockyPrepData Object:\n")
     if (length(object@transformed_data) > 0) {
         cat(paste("Total cell number:", nrow(object@transformed_data), "\n"))
@@ -125,13 +128,13 @@ show.TockyPrepData <- function(object) {
         }
     }
 
-    if (length(object@Stats) > 0) {
-        cat("Stats available: \n")
-        print(names(object@Stats))  # Assuming @Stats is a list and you want to print its element names
-    }
+    if (length(object@Tocky) > 0) {
+         cat("Tocky Data: \n")
+         print(names(object@Tocky))
+     }
+    cat("\n")
+})
 
-    cat("\n")  # For better formatting
-}
 
 
 
@@ -281,6 +284,7 @@ negfile = NULL, samplefile = NULL) {
 #'
 #' @importFrom utils read.csv
 #' @importFrom grDevices rgb
+#' @importFrom methods new
 #' @importFrom graphics abline locator par
 #' @importFrom stats coef density lm sd quantile mad
 

@@ -7,7 +7,7 @@ Authors@R: c(person("Masahiro", "Ono", role = c("aut", "cre"),
 Author: Masahiro Ono [aut, cre]
 Maintainer: Masahiro Ono  <monotockylab@gmail.com>
 Description: This package provides data preprocessing methods for analyzing Fluorescent Timer data obtained by flow cytometry. Specifically, it provides the trigonometric transformation of Timer fluorescence to generate Timer Angle and Timer Intensity.
-Depends: R (>= 4.2.0), utils, stats, graphics, grDevices
+Depends: R (>= 4.2.0), utils, stats, graphics, grDevices, methods
 Suggests: knitr, rmarkdown, KernSmooth
 VignetteBuilder: knitr
 License: Apache License 2.0
