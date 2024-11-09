@@ -11,9 +11,21 @@
 **Author:** Dr. Masahiro Ono  
 **Date:** 6 November 2024
 
-## Introduction - The R Package for Fluorescent Timer Data Aalysis
+## Introduction - The R Package for Fluorescent Timer Data Analysis
 
-Fluorescent Timer proteins uniquely change their emission spectra over time and serve as powerful tools for monitoring the dynamic processes within cells. These proteins are crucial for understanding the intricate temporal dynamics of cellular events. Despite their potential, the analysis of Timer fluorescence data in flow cytometry is often complicated by variability in instrument settings and the absence of standardized data preprocessing methods. To overcome these challenges, the **TockyPrep** package has been developed. This R package provides a comprehensive suite of tools designed to automate the preprocessing, normalization, and trigonometric transformation of Timer fluorescence data.
+
+### The potential of Fluorescent Timer proteins 
+Fluorescent Timer proteins uniquely alter their emission spectra over time, making them powerful tools for monitoring dynamic cellular processes. These proteins are pivotal for understanding the intricate temporal dynamics of cellular events. Despite their potential, analyzing Timer fluorescence data in flow cytometry is often hampered by variability in instrument settings and the lack of standardized data preprocessing methods.
+
+### A Breakthrough in Fluorescent Timer Analysis
+
+A significant advancement was made in 2018 when the Ono lab introduced **Tocky**, a novel concept for analyzing Fluorescent Timer data. This approach encompasses data normalization and transformation methods (see [Introduction of the TockyPrep Package](https://monotockylab.github.io/TockyPrep/articles/Introduction.html)). However, a computational implementation of this methodology was not yet available.
+
+### Aim of the TockyPrep Package
+
+To address these challenges, the **TockyPrep** package has been developed. This R package provides a comprehensive suite of tools designed to automate the preprocessing, normalization, and trigonometric transformation of Timer fluorescence data, facilitating more accurate and reproducible analyses.
+
+
 
 The **TockyPrep** package aims to standardize the analysis of Timer fluorescence to improve reproducibility and accuracy across various experimental setups. It specifically addresses the normalization of immature and mature Timer fluorescence as a critical step for robust analysis. This approach is central to understanding the maturation dynamics of Timer proteins, and is implemented using advanced trigonometric transformations.
 
