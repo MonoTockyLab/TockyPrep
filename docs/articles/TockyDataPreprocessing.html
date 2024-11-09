@@ -224,15 +224,12 @@ visualize Normalized Timer blue and red fluorescence.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Normalized Timer fluorescence"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Warning in KernSmooth::bkde2D(x, bandwidth = bandwidth, gridsize = nbin, :</span></span>
-<span><span class="co">## Binning grid too coarse for current (small) bandwidth: consider increasing</span></span>
-<span><span class="co">## 'gridsize'</span></span></code></pre>
 <p><img src="TockyDataPreprocessing_files/figure-html/plot_tocky_normalized-1.png" width="384"></p>
 <p>Using the option
 <code>plot_mode = "Timer Angle and Intensity"</code>, you can visualize
 the effects of the trigonometric transformation applied to the
 normalized data.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Timer Angle and Intensity"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="TockyDataPreprocessing_files/figure-html/plot_tocky_Angle_Intensity-1.png" width="384"></p>

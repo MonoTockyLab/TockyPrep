@@ -151,7 +151,7 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
                 density <- suppressWarnings(densCols(tpdata$x, tpdata$y, colramp = colorRampPalette(rev(rainbow(10, end = 4/6))))
                 )
             } else {
-                density <- 8  
+                density <- 8
             }
             plot(tpdata, xlab = plotting_params$x_label, ylab = plotting_params$y_label, pch = 19, cex = 0.2, col = density, xlim = plotting_params$xlim, ylim = plotting_params$ylim, cex.main = 2, cex.lab = 2, main = names(plot_data)[i])
             
@@ -174,7 +174,8 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
             tpdata <- plot_data[[i]][, c(plotting_params$x_var, plotting_params$y_var)]
             colnames(tpdata) <- c('x', 'y')
             if (pseudocolour) {
-                density <- densCols(tpdata$x, tpdata$y, colramp = colorRampPalette(rev(rainbow(10, end = 4/6))))
+                density <- suppressWarnings(densCols(tpdata$x, tpdata$y, colramp = colorRampPalette(rev(rainbow(10, end = 4/6))))
+                )
             } else {
                 density <- 8  # A fixed color if pseudocolour is not used
             }
