@@ -13,5 +13,5 @@ template:
 navbar:
   title: TockyPrep
   structure:
-    left: [home, reference, articles]
+    left: [home, reference, articles, news]
     right: [github, search]
