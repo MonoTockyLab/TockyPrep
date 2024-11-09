@@ -16,7 +16,7 @@
 #' This function visualizes either Timer fluorescence (Blue vs Red) or Timer dynamics
 #' by the Tocky method (Angle vs Intensity) based on the specified mode.
 #'
-#' @param timer_transform_output A TockyPrepData object returned by `timer_transform`, which sample grouping has been defined by `sample_definition`.
+#' @param x A TockyPrepData object returned by `timer_transform`, which sample grouping has been defined by `sample_definition`.
 #' @param file File name.
 #' @param pseudocolour A logical argument for whether to use pseudocolour in plots.
 #' @param interactive Logical indicating whether to prompt the user to select plot_mode.
@@ -42,15 +42,15 @@
 #' @importFrom grDevices jpeg densCols colorRampPalette rainbow dev.off
 #' @importFrom stats quantile
 
-plot_tocky <- function(timer_transform_output, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, output = 'QC', n = 4, plot_mode = "Timer fluorescence", lower_quantile_cutoff = 0.01, select = FALSE, group = TRUE, group_order = NULL, interactive = TRUE, save = FALSE,
+plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, output = 'QC', n = 4, plot_mode = "Timer fluorescence", lower_quantile_cutoff = 0.01, select = FALSE, group = TRUE, group_order = NULL, interactive = TRUE, save = FALSE,
     samplefile = NULL, verbose = TRUE) {
     n <- min(n, 4)
     
-    if(!inherits(timer_transform_output, "TockyPrepData")){
+    if(!inherits(x, "TockyPrepData")){
         stop("Use the output of timer_transform. \n")
     }
     
-    if(length(timer_transform_output@sample_definition$file)==0){
+    if(length(x@sample_definition$file)==0){
         stop("Use sample_definition. \n")
     }
     
@@ -64,19 +64,19 @@ plot_tocky <- function(timer_transform_output, file = 'PlotTocky', pseudocolour 
         plot_mode <- utils::select.list(choices = plot_mode_choices, title = "Select plot mode:", graphics = FALSE)
     }
     
-    samples <- timer_transform_output@sample_definition$file
+    samples <- x@sample_definition$file
 
     if(is.null(samplefile)){
         if (select) {
             selected_samples <- utils::select.list(samples, graphics = TRUE, title = "Choose samples for plotting", multiple = TRUE)
-            data <- timer_transform_output@transformed_data[timer_transform_output@transformed_data$file %in% selected_samples, ]
+            data <- x@transformed_data[x@transformed_data$file %in% selected_samples, ]
         } else {
-            data <- timer_transform_output@transformed_data
+            data <- x@transformed_data
         }
         
     }else{
-        if(all(samplefile %in%  timer_transform_output@transformed_data$file)){
-            data <- timer_transform_output@transformed_data[timer_transform_output@transformed_data$file %in% samplefile, ]
+        if(all(samplefile %in%  x@transformed_data$file)){
+            data <- x@transformed_data[x@transformed_data$file %in% samplefile, ]
             
         }else{
             
@@ -85,7 +85,7 @@ plot_tocky <- function(timer_transform_output, file = 'PlotTocky', pseudocolour 
     }
 
     
-    data <- merge(data, timer_transform_output@sample_definition, by = 'file')
+    data <- merge(data, x@sample_definition, by = 'file')
     if(verbose){
         cat("Now plotting..\n")
         }
@@ -156,8 +156,8 @@ plot_tocky <- function(timer_transform_output, file = 'PlotTocky', pseudocolour 
             
             if(plot_mode == "Timer fluorescence"){
                 abline(
-                v = timer_transform_output@normalization_parameters$red_threshold,
-                h = timer_transform_output@normalization_parameters$blue_threshold,
+                v = x@normalization_parameters$red_threshold,
+                h = x@normalization_parameters$blue_threshold,
                 col = 2
                 )
             }
@@ -181,8 +181,8 @@ plot_tocky <- function(timer_transform_output, file = 'PlotTocky', pseudocolour 
             
             if(plot_mode == "Timer fluorescence"){
                 abline(
-                v = timer_transform_output@normalization_parameters$red_threshold,
-                h = timer_transform_output@normalization_parameters$blue_threshold,
+                v = x@normalization_parameters$red_threshold,
+                h = x@normalization_parameters$blue_threshold,
                 col = 2
                 )
             }

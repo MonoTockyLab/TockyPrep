@@ -1,3 +1,16 @@
+# Copyright 2024 Masahiro Ono
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 #' A class representing a TockyPrepData object for output of timer_transform
 #'
 #' This class is designed to encapsulate and structure the output of the
@@ -12,6 +25,7 @@
 #' @slot timer_fluorescence A list containing fluorescence timing data.
 #' @slot input A list of raw input data.
 #' @slot normalization_parameters A list of parameters used for data normalization.
+#' @slot Tocky A list containing other Tocky-specific analysis features
 #'
 #' @keywords classes
 #' @export
@@ -24,7 +38,8 @@ setClass(
     sample_definition = "data.frame",
     timer_fluorescence = "list",
     input = "list",
-    normalization_parameters = "list"
+    normalization_parameters = "list",
+    Tocky = "list"
   ),
   validity = function(object) {
     problems <- NULL
@@ -50,18 +65,75 @@ setClass(
   }
 )
 
-# Copyright 2024 Masahiro Ono
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+#' Initialize a TockyPrepData object
+#'
+#' This method initializes a TockyPrepData with specific data for flow cytometry analysis.
+#' It ensures all inherited and specific slots are set up.
+#'
+#' @param .Object A TockyPrepData object to be initialized
+#' @param transformed_data A data.frame containing transformed data.
+#' @param cell_counts A data.frame containing counts of cells per sample.
+#' @param sample_definition A data.frame containing metadata for each sample.
+#' @param timer_fluorescence A list containing fluorescence timing data.
+#' @param input A list of raw input data.
+#' @param normalization_parameters A list of parameters used for data normalization.
+#' @param Tocky A list containing other Tocky-specific analysis features
+#'
+#' @return A valid TockyPrepData that has been initialized with provided data.
+#' @export
+#' @keywords internal
+
+setMethod("initialize", "TockyPrepData",
+  function(.Object, transformed_data, cell_counts, sample_definition, timer_fluorescence, input, normalization_parameters, Tocky) {
+    .Object@transformed_data <- transformed_data
+    .Object@cell_counts <- cell_counts
+    .Object@sample_definition <- sample_definition
+    .Object@timer_fluorescence <- timer_fluorescence
+    .Object@input <- input
+    .Object@normalization_parameters <- normalization_parameters
+    .Object@Tocky <- Tocky
+
+    validObject(.Object)
+
+     return(.Object)
+  }
+)
+
+#' Show method for the TockyPrepData class
+#'
+#' Displays summary information for various slots of the TockyPrepData object.
+#' Includes details such as total number of cells, variable names, sample numbers,
+#' and group levels, providing a concise summary of the object.
+#'
+#' @param object An object of the TockyPrepData class
+#' @export
+#' @method show TockyPrepData
+#' @importFrom methods setMethod
+#' @keywords methods internal
+
+show.TockyPrepData <- function(object) {
+    cat("TockyPrepData Object:\n")
+    if (length(object@transformed_data) > 0) {
+        cat(paste("Total cell number:", nrow(object@transformed_data), "\n"))
+        cat("Variables: ", paste(head(colnames(object@transformed_data)), collapse=", "), "\n")
+    }
+    
+    if (length(object@sample_definition) > 0) {
+        cat(paste("Total sample number:", nrow(object@sample_definition), "\n"))
+        if ("group" %in% colnames(object@sample_definition)) {
+            cat("Groups: ", paste(levels(as.factor(object@sample_definition[['group']])), collapse=", "), "\n")
+        }
+    }
+
+    if (length(object@Stats) > 0) {
+        cat("Stats available: \n")
+        print(names(object@Stats))  # Assuming @Stats is a list and you want to print its element names
+    }
+
+    cat("\n")  # For better formatting
+}
+
+
 
 #' Prepare Data for Timer Transformation Using Flow Cytometric Data
 #'
@@ -235,6 +307,10 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         x.log[lg] <- log10(x.log[lg])
         x.log[!lg] <- 0
         return(x.log)
+    }
+    
+    if(!all(c("neg","path","samplefile", "variables") %in% names(prep))){
+        stop("Use a correct prep input. \n")
     }
     
     negfile <- prep$neg
@@ -486,7 +562,8 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
                   sample_definition = sample_definition,
                   timer_fluorescence = timer_fluorescence,
                   input = input_list,
-                  normalization_parameters = normalization_parameters)
+                  normalization_parameters = normalization_parameters,
+                  Tocky = list())
     
     return(output)
 }
@@ -509,7 +586,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 #' This function takes the output from `timer_transform`, specifically the `sample_definition` data frame,
 #' exports it to a CSV file for the user to edit group assignments, and then reads the updated file back into R.
 #'
-#' @param timer_transform_output A TockyPrepData object returned by `timer_transform`, containing `sample_definition`.
+#' @param x A TockyPrepData object returned by `timer_transform`, containing `sample_definition`.
 #' @param output_dir Character string specifying the directory to save the `sample_definition.csv` file.
 #'                   If `NULL`, the file is saved in the current working directory. Default is `NULL`.
 #' @param filename Character string specifying the name of the sample definition file. Default is `"sample_definition.csv"`.
@@ -533,15 +610,15 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 #' }
 #' @importFrom utils write.table read.table
 
-sample_definition <- function(timer_transform_output, sample_definition = NULL, output_dir = NULL, filename = "sample_definition.csv",
+sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, filename = "sample_definition.csv",
                               sep = ",", verbose = TRUE, interactive = FALSE) {
                                   
-  if(!inherits(timer_transform_output, "TockyPrepData")){
+  if(!inherits(x, "TockyPrepData")){
       stop("Use the output of timer_transform. \n")
   }
   
   if(interactive){
-      sn <- timer_transform_output@sample_definition
+      sn <- x@sample_definition
       
       if (!is.null(output_dir)) {
         if (!dir.exists(output_dir)) {
@@ -562,7 +639,7 @@ sample_definition <- function(timer_transform_output, sample_definition = NULL, 
       readline(prompt = "Press [Enter] when you have edited the group clumn updated the sample definition file and saved it.")
       
       sn_updated <- read.table(output_file, sep = sep, header = TRUE, stringsAsFactors = FALSE)
-      timer_transform_output@sample_definition <- sn_updated
+      x@sample_definition <- sn_updated
       
       if (verbose) {
         message("Updated sample definition has been read.")
@@ -570,7 +647,7 @@ sample_definition <- function(timer_transform_output, sample_definition = NULL, 
   }else{
       if(!is.null(sample_definition)){
           if(is.data.frame(sample_definition)){
-              timer_transform_output@sample_definition <- sample_definition
+              x@sample_definition <- sample_definition
           }else{
               stop("Use data frame for sample_definition data. \n")
           }
@@ -581,7 +658,7 @@ sample_definition <- function(timer_transform_output, sample_definition = NULL, 
       
   }
   
-  return(timer_transform_output)
+  return(x)
 }
 
 
