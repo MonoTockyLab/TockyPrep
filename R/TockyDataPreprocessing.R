@@ -19,9 +19,9 @@
 #' are included and validated. This structure is particularly useful for downstream
 #' processing and analysis in related packages like TockyLocus and TockyBase.
 #'
-#' @slot transformed_data A data.frame containing transformed data.
+#' @slot Data A data.frame containing transformed data.
 #' @slot cell_counts A data.frame containing counts of cells per sample.
-#' @slot sample_definition A data.frame containing metadata for each sample.
+#' @slot sampledef A data.frame containing metadata for each sample.
 #' @slot timer_fluorescence A list containing fluorescence timing data.
 #' @slot input A list of raw input data.
 #' @slot normalization_parameters A list of parameters used for data normalization.
@@ -33,9 +33,9 @@
 setClass(
   "TockyPrepData",
   slots = list(
-    transformed_data = "data.frame",
+    Data = "data.frame",
     cell_counts = "data.frame",
-    sample_definition = "data.frame",
+    sampledef = "list",
     timer_fluorescence = "list",
     input = "list",
     normalization_parameters = "list",
@@ -43,14 +43,14 @@ setClass(
   ),
   validity = function(object) {
     problems <- NULL
-    if (!is.data.frame(object@transformed_data)) {
-      problems <- c(problems, "transformed_data must be a data.frame.")
+    if (!is.data.frame(object@Data)) {
+      problems <- c(problems, "Data must be a data.frame.")
     }
     if (!is.data.frame(object@cell_counts)) {
       problems <- c(problems, "cell_counts must be a data.frame.")
     }
-    if (!is.data.frame(object@sample_definition)) {
-      problems <- c(problems, "sample_definition must be a data.frame.")
+    if (!is.list(object@sampledef)) {
+      problems <- c(problems, "sampledef must be a list.")
     }
     if (!is.list(object@timer_fluorescence)) {
       problems <- c(problems, "timer_fluorescence must be a list.")
@@ -75,9 +75,9 @@ setClass(
 #' It ensures all specific slots are set up.
 #'
 #' @param .Object A TockyPrepData object to be initialized.
-#' @param transformed_data A data.frame containing transformed data.
+#' @param Data A data.frame containing transformed data.
 #' @param cell_counts A data.frame containing counts of cells per sample.
-#' @param sample_definition A data.frame containing metadata for each sample.
+#' @param sampledef A data.frame containing metadata for each sample.
 #' @param timer_fluorescence A list containing fluorescence timing data.
 #' @param input A list of raw input data.
 #' @param normalization_parameters A list of parameters used for data normalization.
@@ -88,10 +88,10 @@ setClass(
 #' @importFrom methods initialize validObject
 #' @export
 setMethod("initialize", "TockyPrepData",
-  function(.Object, transformed_data, cell_counts, sample_definition, timer_fluorescence, input, normalization_parameters, Tocky) {
-    .Object@transformed_data <- transformed_data
+  function(.Object, Data, cell_counts, sampledef, timer_fluorescence, input, normalization_parameters, Tocky) {
+    .Object@Data <- Data
     .Object@cell_counts <- cell_counts
-    .Object@sample_definition <- sample_definition
+    .Object@sampledef <- sampledef
     .Object@timer_fluorescence <- timer_fluorescence
     .Object@input <- input
     .Object@normalization_parameters <- normalization_parameters
@@ -116,15 +116,15 @@ setMethod("initialize", "TockyPrepData",
 #' @importFrom utils head
 setMethod("show", "TockyPrepData", function(object) {
     cat("TockyPrepData Object:\n")
-    if (length(object@transformed_data) > 0) {
-        cat(paste("Total cell number:", nrow(object@transformed_data), "\n"))
-        cat("Variables: ", paste(head(colnames(object@transformed_data)), collapse=", "), "\n")
+    if (length(object@Data) > 0) {
+        cat(paste("Total cell number:", nrow(object@Data), "\n"))
+        cat("Variables: ", paste(head(colnames(object@Data)), collapse=", "), "\n")
     }
     
-    if (length(object@sample_definition) > 0) {
-        cat(paste("Total sample number:", nrow(object@sample_definition), "\n"))
-        if ("group" %in% colnames(object@sample_definition)) {
-            cat("Groups: ", paste(levels(as.factor(object@sample_definition[['group']])), collapse=", "), "\n")
+    if (length(object@sampledef) > 0) {
+        cat(paste("Total sample number:", nrow(object@sampledef), "\n"))
+        if ("group" %in% colnames(object@sampledef)) {
+            cat("Groups: ", paste(levels(as.factor(object@sampledef[['group']])), collapse=", "), "\n")
         }
     }
 
@@ -227,18 +227,6 @@ negfile = NULL, samplefile = NULL) {
 }
 
 
-# Copyright 2024 Masahiro Ono
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 #' Perform Timer Transformation on Flow Cytometry Data
 #'
@@ -269,10 +257,10 @@ negfile = NULL, samplefile = NULL) {
 #'
 #' @return The function returns a new TockyPrepData object containing:
 #'   \itemize{
-#'     \item \code{transformed_data}: Data frame with angle, intensity, and other variables.
+#'     \item \code{Data}: Data frame with angle, intensity, and other variables.
 #'     \item \code{normalization_parameters}: List with normalization values and coefficients.
 #'     \item \code{cell_counts}: Data frame with cell counts for each sample.
-#'     \item \code{sample_definition}: Data frame with sample file names and placeholder group column.
+#'     \item \code{sampledef}: Data frame with sample file names and placeholder group column.
 #'   }
 #' @export
 #'
@@ -521,12 +509,13 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     }
 
     sample_files <- unique(result_all$file)
-    sample_definition <- data.frame(
+    
+    sampledef_df <- data.frame(
     file = sample_files,
     group = rep("", length(sample_files)),
     stringsAsFactors = FALSE
     )
-
+    sampledef <- list(sampledef = sampledef_df)
 
     if (normalization) {
         normalization_parameters <- list(
@@ -561,9 +550,9 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         )
     
     output <- new("TockyPrepData",
-                  transformed_data = result_all,
+                  Data = result_all,
                   cell_counts = cell_counts,
-                  sample_definition = sample_definition,
+                  sampledef = sampledef,
                   timer_fluorescence = timer_fluorescence,
                   input = input_list,
                   normalization_parameters = normalization_parameters,
@@ -572,28 +561,15 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     return(output)
 }
 
-# Copyright 2024 Masahiro Ono
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 #' Update sample definitions and group assignments
 #'
-#' This function takes the output from `timer_transform`, specifically the `sample_definition` data frame,
+#' This function takes the output from `timer_transform`, specifically the `sampledef` data frame,
 #' exports it to a CSV file for the user to edit group assignments, and then reads the updated file back into R.
 #'
-#' @param x A TockyPrepData object returned by `timer_transform`, containing `sample_definition`.
-#' @param output_dir Character string specifying the directory to save the `sample_definition.csv` file.
+#' @param x A TockyPrepData object returned by `timer_transform`, containing `sampledef`.
+#' @param output_dir Character string specifying the directory to save the `sampledef.csv` file.
 #'                   If `NULL`, the file is saved in the current working directory. Default is `NULL`.
-#' @param filename Character string specifying the name of the sample definition file. Default is `"sample_definition.csv"`.
+#' @param filename Character string specifying the name of the sample definition file. Default is `"sampledef.csv"`.
 #' @param sep Character string indicating the field separator used in the CSV file. Default is `","`.
 #' @param verbose Logical indicating whether to display messages. Default is `TRUE`.
 #' @param sample_definition (Optional) to use a data frame object as an input, specify the input object by this parameter. Defaul is `NULL`.
@@ -607,14 +583,14 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
 #' @examples
 #' \dontrun{
 #'   # Assuming `result` is the output from `timer_transform`
-#'   sample_def <- sample_definition(result, output_dir = "output_directory")
+#'   sample_def <- sampledef(result, output_dir = "output_directory")
 #'   # The function will pause, allowing you to edit the 'group' column in the CSV file.
 #'   # After editing and saving the file, press Enter in R to continue.
 #'   # The updated sample definitions will be returned as a data frame.
 #' }
 #' @importFrom utils write.table read.table
 
-sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, filename = "sample_definition.csv",
+sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, filename = "sampledef.csv",
                               sep = ",", verbose = TRUE, interactive = FALSE) {
                                   
   if(!inherits(x, "TockyPrepData")){
@@ -622,7 +598,7 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
   }
   
   if(interactive){
-      sn <- x@sample_definition
+      sn <- x@sampledef$sampledef
       
       if (!is.null(output_dir)) {
         if (!dir.exists(output_dir)) {
@@ -643,7 +619,7 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
       readline(prompt = "Press [Enter] when you have edited the group clumn updated the sample definition file and saved it.")
       
       sn_updated <- read.table(output_file, sep = sep, header = TRUE, stringsAsFactors = FALSE)
-      x@sample_definition <- sn_updated
+      x@sampledef$sampledef <- sn_updated
       
       if (verbose) {
         message("Updated sample definition has been read.")
@@ -651,12 +627,12 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
   }else{
       if(!is.null(sample_definition)){
           if(is.data.frame(sample_definition)){
-              x@sample_definition <- sample_definition
+              x@sampledef$sampledef <- sample_definition
           }else{
-              stop("Use data frame for sample_definition data. \n")
+              stop("Use data frame for sampledef data. \n")
           }
       }else{
-          stop("Include sample_definition data frame or use interactive mode. \n")
+          stop("Include sampledef data frame or use interactive mode. \n")
       }
       
       

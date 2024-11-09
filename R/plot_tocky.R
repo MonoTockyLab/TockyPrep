@@ -16,7 +16,7 @@
 #' This function visualizes either Timer fluorescence (Blue vs Red) or Timer dynamics
 #' by the Tocky method (Angle vs Intensity) based on the specified mode.
 #'
-#' @param x A TockyPrepData object returned by `timer_transform`, which sample grouping has been defined by `sample_definition`.
+#' @param x A TockyPrepData object returned by `timer_transform`, which sample grouping has been defined by `sampledef`.
 #' @param file File name.
 #' @param pseudocolour A logical argument for whether to use pseudocolour in plots.
 #' @param interactive Logical indicating whether to prompt the user to select plot_mode.
@@ -29,7 +29,7 @@
 #' @param group_order Optional character vector for specifying the order of the panels when using the group option.
 #' @param lower_quantile_cutoff Lower quantile cutoff for setting the plot ranges in fluorescence mode.
 #' @param select Logical indicating whether to manually select samples for plotting.
-#' @param group Logical indicating whether to group plots based on the `group` field in `sample_definition`.
+#' @param group Logical indicating whether to group plots based on the `group` field in `sampledef`.
 #' @param verbose Logical indicating whether to print progress messages.
 #'        Default is `TRUE`.
 #' @param samplefile Character vector specifying the sample files. Defaults to `NULL`.
@@ -50,8 +50,8 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
         stop("Use the output of timer_transform. \n")
     }
     
-    if(length(x@sample_definition$file)==0){
-        stop("Use sample_definition. \n")
+    if(length(x@sampledef$sampledef$file)==0){
+        stop("Use sampledef. \n")
     }
     
     if (!file.exists(output)) {
@@ -64,19 +64,19 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
         plot_mode <- utils::select.list(choices = plot_mode_choices, title = "Select plot mode:", graphics = FALSE)
     }
     
-    samples <- x@sample_definition$file
+    samples <- x@sampledef$sampledef$file
 
     if(is.null(samplefile)){
         if (select) {
             selected_samples <- utils::select.list(samples, graphics = TRUE, title = "Choose samples for plotting", multiple = TRUE)
-            data <- x@transformed_data[x@transformed_data$file %in% selected_samples, ]
+            data <- x@Data[x@Data$file %in% selected_samples, ]
         } else {
-            data <- x@transformed_data
+            data <- x@Data
         }
         
     }else{
-        if(all(samplefile %in%  x@transformed_data$file)){
-            data <- x@transformed_data[x@transformed_data$file %in% samplefile, ]
+        if(all(samplefile %in%  x@Data$file)){
+            data <- x@Data[x@Data$file %in% samplefile, ]
             
         }else{
             
@@ -85,7 +85,7 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
     }
 
     
-    data <- merge(data, x@sample_definition, by = 'file')
+    data <- merge(data, x@sampledef$sampledef, by = 'file')
     if(verbose){
         cat("Now plotting..\n")
         }
