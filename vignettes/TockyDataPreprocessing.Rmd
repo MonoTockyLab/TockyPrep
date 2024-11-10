@@ -151,7 +151,7 @@ plot_tocky(transformed_data, plot_mode = "Timer Angle and Intensity", interactiv
 
 
 ```{r, out.width = "30%", echo = FALSE}
-knitr::include_graphics('assets/TockyPrep_logo.jpg')
+knitr::include_graphics('assets/TockyPrep.png')
 ```
 
 

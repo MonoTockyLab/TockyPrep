@@ -118,10 +118,10 @@ setMethod("show", "TockyPrepData", function(object) {
         cat("Variables: ", paste(head(colnames(object@Data)), collapse=", "), "\n")
     }
     
-    if (length(object@sampledef) > 0) {
-        cat(paste("Total sample number:", nrow(object@sampledef), "\n"))
-        if ("group" %in% colnames(object@sampledef)) {
-            cat("Groups: ", paste(levels(as.factor(object@sampledef[['group']])), collapse=", "), "\n")
+    if (length(object@sampledef$sampledef) > 0) {
+        cat(paste("Total sample number:", nrow(object@sampledef$sampledef), "\n"))
+        if ("group" %in% colnames(object@sampledef$sampledef)) {
+            cat("Groups: ", paste(levels(as.factor(object@sampledef$sampledef[['group']])), collapse=", "), "\n")
         }
     }
 
