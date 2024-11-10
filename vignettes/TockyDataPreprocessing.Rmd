@@ -3,6 +3,7 @@ title: "TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Ti
 author: "Dr. Masahiro Ono"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: TockyPrep.bib
 link-citations: TRUE
 vignette: >
   %\VignetteIndexEntry{TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Timer Analysis}
@@ -115,7 +116,7 @@ transformed_data <- sample_definition(transformed_data, sample_definition = samp
 Alternatively, sample grouping can be created by choosing interaction session using the option `interactive = TRUE`. This will prompt generation of sample_definition.csv in your output directory.
 
 ```{r sample_definition2, include=FALSE, }
-transformed_data <- sample_definition(transformed_data, output_dir = 'outuput', interactive = TRUE)
+#transformed_data <- sample_definition(transformed_data, output_dir = 'outuput', interactive = TRUE)
 
 ```
 
@@ -125,32 +126,44 @@ To visualize the processed Timer data, use `plot_tocky`. This is a versatile fun
 - `'Normalized Timer fluorescence'`: Normalized and thrsholded Timer blue and red fluorescence.
 - `'Timer Angle and Intensity'`: Timer Angle and Intensity after trigonometric transformation.
 
-The default is `'Timer fluorescence'`.
+### Non-normalized Timer fluorescence (Figure 1)
+The default is `'Timer fluorescence'`, which is non-normalized Timer fluorescence.
 
-```{r plot_tocky_timer_fluorescence, fig.width=4, fig.height=4}
+```{r plot_tocky_timer_fluorescence, fig.width=4, fig.height=4, fig.cap="Figure 1: Non-normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation."}
 
-logic <- sample_definition$group %in% c(0, 4, 8, 12)
+logic <- sample_definition$group %in% c(4, 8, 12, 16)
 samplefiles <- sample_definition$file[logic]
+show(samplefiles)
 # Visualizing the results
 plot_tocky(transformed_data, interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
+
 ```
 
+### Normalized Timer fluorescence (Figure 2)
 Using the option `plot_mode = "Normalized Timer fluorescence"`, you can visualize Normalized Timer blue and red fluorescence.
 
-```{r plot_tocky_normalized, fig.width=4, fig.height=4}
+
+
+```{r plot_tocky_normalized, fig.width=4, fig.height=4, fig.cap="Figure 2: Normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation."}
 # Visualizing the results
 plot_tocky(transformed_data, plot_mode = "Normalized Timer fluorescence", interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
 ```
 
+### Timer Angle and Intensity (Figure 3)
 Using the option `plot_mode = "Timer Angle and Intensity"`, you can visualize the effects of the trigonometric transformation applied to the normalized data.
 
-```{r plot_tocky_Angle_Intensity, fig.width=4, fig.height=4}
+```{r plot_tocky_Angle_Intensity, fig.width=4, fig.height=4,  fig.cap="Figure 3: Timer Angle and Timer Intensity in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation."}
 # Visualizing the results
 plot_tocky(transformed_data, plot_mode = "Timer Angle and Intensity", interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
 ```
 
+# Conclusion
 
-```{r, out.width = "30%", echo = FALSE}
+**TockyPrep** provides a comprehensive suite of data preprocessing methods for deriving Timer Angle and Timer Intensity data. This suite includes Timer thresholding, Timer normalization, and trigonometric transformation. The resulting Timer Angle and Intensity data can be robustly used in downstream analyses.
+
+Please explore downstream analysis examples in @Bending2018JCB; @Bending2018EMBO; and @Hassan2022.
+
+```{r, out.width = "50%", echo = FALSE}
 knitr::include_graphics('assets/TockyPrep.png')
 ```
 
@@ -158,3 +171,6 @@ knitr::include_graphics('assets/TockyPrep.png')
 ```{r, out.width = "30%", echo = FALSE}
 knitr::include_graphics('assets/MonoLab.jpg')
 ```
+
+
+# References

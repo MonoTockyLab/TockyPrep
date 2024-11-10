@@ -29,7 +29,7 @@
 #' @param group_order Optional character vector for specifying the order of the panels when using the group option.
 #' @param lower_quantile_cutoff Lower quantile cutoff for setting the plot ranges in fluorescence mode.
 #' @param select Logical indicating whether to manually select samples for plotting.
-#' @param group Logical indicating whether to group plots based on the `group` field in `sampledef`.
+#' @param use_group Logical indicating whether to group plots based on the `group` field in `sampledef`.
 #' @param verbose Logical indicating whether to print progress messages.
 #'        Default is `TRUE`.
 #' @param samplefile Character vector specifying the sample files. Defaults to `NULL`.
@@ -42,7 +42,7 @@
 #' @importFrom grDevices jpeg densCols colorRampPalette rainbow dev.off
 #' @importFrom stats quantile
 
-plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, output = 'QC', n = 4, plot_mode = "Timer fluorescence", lower_quantile_cutoff = 0.01, select = FALSE, group = TRUE, group_order = NULL, interactive = TRUE, save = FALSE,
+plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, output = 'QC', n = 4, plot_mode = "Timer fluorescence", lower_quantile_cutoff = 0.01, select = FALSE, use_group = TRUE, group_order = NULL, interactive = TRUE, save = FALSE,
     samplefile = NULL, verbose = TRUE) {
     n <- min(n, 4)
     
@@ -70,6 +70,7 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
         if (select) {
             selected_samples <- utils::select.list(samples, graphics = TRUE, title = "Choose samples for plotting", multiple = TRUE)
             data <- x@Data[x@Data$file %in% selected_samples, ]
+            sampledef <- x@sampledef$sampledef[x@sampledef$sampledef$file %in% selected_samples,]
         } else {
             data <- x@Data
         }
@@ -77,6 +78,7 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
     }else{
         if(all(samplefile %in%  x@Data$file)){
             data <- x@Data[x@Data$file %in% samplefile, ]
+            sampledef <- x@sampledef$sampledef[x@sampledef$sampledef$file %in% samplefile,]
             
         }else{
             
@@ -85,7 +87,8 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
     }
 
     
-    data <- merge(data, x@sampledef$sampledef, by = 'file')
+    data <- merge(data, sampledef, by = 'file')
+    
     if(verbose){
         cat("Now plotting..\n")
         }
@@ -122,9 +125,9 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
 
     
     data$file <- as.factor(data$file)
-    data$group <- as.factor(data$group)
+    data$group <- as.factor(as.character(data$group))
     
-    if (group) {
+    if (use_group) {
         if (!is.null(group_order)) {
             data$group <- factor(data$group, levels = group_order)
         }
@@ -173,22 +176,39 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
             
             tpdata <- plot_data[[i]][, c(plotting_params$x_var, plotting_params$y_var)]
             colnames(tpdata) <- c('x', 'y')
+            
+            # Remove rows with missing or infinite values
+            tpdata <- tpdata[is.finite(tpdata$x) & is.finite(tpdata$y), ]
+            
+            # Check if there's any data left after cleaning
+            if (nrow(tpdata) == 0) {
+                warning("No valid data to plot for ", names(plot_data)[i])
+                next  # Skip this iteration if there's no data
+            }
+            
             if (pseudocolour) {
-                density <- suppressWarnings(densCols(tpdata$x, tpdata$y, colramp = colorRampPalette(rev(rainbow(10, end = 4/6))))
+                density <- suppressWarnings(
+                    densCols(tpdata$x, tpdata$y, colramp = colorRampPalette(rev(rainbow(10, end = 4/6))))
                 )
             } else {
                 density <- 8  # A fixed color if pseudocolour is not used
             }
-            plot(tpdata, xlab = plotting_params$x_label, ylab = plotting_params$y_label, pch = 19, cex = 0.2, col = density, xlim = plotting_params$xlim, ylim = plotting_params$ylim, cex.main = 0.8, cex.lab = 0.8, main = names(plot_data)[i])
             
-            if(plot_mode == "Timer fluorescence"){
+            # Proceed with plotting
+            plot(tpdata, xlab = plotting_params$x_label, ylab = plotting_params$y_label, pch = 19, cex = 0.2,
+                 col = density, xlim = plotting_params$xlim, ylim = plotting_params$ylim,
+                 cex.main = 0.8, cex.lab = 0.8, main = names(plot_data)[i])
+            
+            if (plot_mode == "Timer fluorescence") {
                 abline(
-                v = x@normalization_parameters$red_threshold,
-                h = x@normalization_parameters$blue_threshold,
-                col = 2
+                    v = x@normalization_parameters$red_threshold,
+                    h = x@normalization_parameters$blue_threshold,
+                    col = 2
                 )
             }
         }
+
+
     }
 
 

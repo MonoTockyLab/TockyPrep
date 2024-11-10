@@ -172,7 +172,7 @@ prep_tocky <- function(path = '.', interactive = TRUE,
 negfile = NULL, samplefile = NULL) {
     files_in_path <- list.files(path, pattern = "\\.csv$", full.names = TRUE)
     
-
+    files_in_path <- sub("^\\./", "", files_in_path)
     
     if (interactive) {
 
@@ -212,6 +212,9 @@ negfile = NULL, samplefile = NULL) {
     vard[grepl(pattern = 'Blue', vard, ignore.case = TRUE)] <- "Timer_Blue"
     
     vardf <- data.frame(Channel.name = colnames(neg), Variable = vard, stringsAsFactors = FALSE)
+    
+
+    
     
     output_list <- list(
     neg = negfile,
@@ -616,6 +619,8 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
       readline(prompt = "Press [Enter] when you have edited the group clumn updated the sample definition file and saved it.")
       
       sn_updated <- read.table(output_file, sep = sep, header = TRUE, stringsAsFactors = FALSE)
+      unique_groups <- unique(sn_updated$group)
+      sn_updated$group <- factor(sn_updated$group, levels = unique_groups)
       x@sampledef$sampledef <- sn_updated
       
       if (verbose) {
@@ -624,6 +629,8 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
   }else{
       if(!is.null(sample_definition)){
           if(is.data.frame(sample_definition)){
+              unique_groups <- unique(sample_definition$group)
+              sample_definition$group <- factor(sample_definition$group, levels = unique_groups)
               x@sampledef$sampledef <- sample_definition
           }else{
               stop("Use data frame for sampledef data. \n")
@@ -635,6 +642,7 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
       
   }
   
+
   return(x)
 }
 

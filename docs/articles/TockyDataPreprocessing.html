@@ -211,30 +211,100 @@ thrsholded Timer blue and red fluorescence.</li>
 <code>'Timer Angle and Intensity'</code>: Timer Angle and Intensity
 after trigonometric transformation.</li>
 </ul>
-<p>The default is <code>'Timer fluorescence'</code>.</p>
+<div class="section level4">
+<h4 id="non-normalized-timer-fluorescence-figure-1">Non-normalized Timer fluorescence (Figure 1)<a class="anchor" aria-label="anchor" href="#non-normalized-timer-fluorescence-figure-1"></a>
+</h4>
+<p>The default is <code>'Timer fluorescence'</code>, which is
+non-normalized Timer fluorescence.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">logic</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">12</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">logic</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">12</span>, <span class="fl">16</span><span class="op">)</span></span>
 <span><span class="va">samplefiles</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">file</span><span class="op">[</span><span class="va">logic</span><span class="op">]</span></span>
-<span><span class="co"># Visualizing the results</span></span>
+<span><span class="fu">show</span><span class="op">(</span><span class="va">samplefiles</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##  [1] "sample_12hrs_R1.csv" "sample_12hrs_R2.csv" "sample_12hrs_R3.csv"</span></span>
+<span><span class="co">##  [4] "sample_16hrs_R1.csv" "sample_16hrs_R2.csv" "sample_16hrs_R3.csv"</span></span>
+<span><span class="co">##  [7] "sample_4hrs_R1.csv"  "sample_4hrs_R2.csv"  "sample_4hrs_R3.csv" </span></span>
+<span><span class="co">## [10] "sample_8hrs_R1.csv"  "sample_8hrs_R2.csv"  "sample_8hrs_R3.csv"</span></span></code></pre>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="TockyDataPreprocessing_files/figure-html/plot_tocky_timer_fluorescence-1.png" width="384"></p>
+<div class="figure">
+<img src="TockyDataPreprocessing_files/figure-html/plot_tocky_timer_fluorescence-1.png" alt="Figure 1: Non-normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation." width="384"><p class="caption">
+Figure 1: Non-normalized Timer Fluorescence in T cells stimulated by
+antigen and analyzed at 4, 8, 12, and 16 hours after activation.
+</p>
+</div>
+</div>
+<div class="section level4">
+<h4 id="normalized-timer-fluorescence-figure-2">Normalized Timer fluorescence (Figure 2)<a class="anchor" aria-label="anchor" href="#normalized-timer-fluorescence-figure-2"></a>
+</h4>
 <p>Using the option
 <code>plot_mode = "Normalized Timer fluorescence"</code>, you can
 visualize Normalized Timer blue and red fluorescence.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Normalized Timer fluorescence"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="TockyDataPreprocessing_files/figure-html/plot_tocky_normalized-1.png" width="384"></p>
+<div class="figure">
+<img src="TockyDataPreprocessing_files/figure-html/plot_tocky_normalized-1.png" alt="Figure 2: Normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation." width="384"><p class="caption">
+Figure 2: Normalized Timer Fluorescence in T cells stimulated by antigen
+and analyzed at 4, 8, 12, and 16 hours after activation.
+</p>
+</div>
+</div>
+<div class="section level4">
+<h4 id="timer-angle-and-intensity-figure-3">Timer Angle and Intensity (Figure 3)<a class="anchor" aria-label="anchor" href="#timer-angle-and-intensity-figure-3"></a>
+</h4>
 <p>Using the option
 <code>plot_mode = "Timer Angle and Intensity"</code>, you can visualize
 the effects of the trigonometric transformation applied to the
 normalized data.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Timer Angle and Intensity"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="TockyDataPreprocessing_files/figure-html/plot_tocky_Angle_Intensity-1.png" width="384"></p>
-<p><img src="assets%2FTockyPrep.png" width="30%"></p>
+<div class="figure">
+<img src="TockyDataPreprocessing_files/figure-html/plot_tocky_Angle_Intensity-1.png" alt="Figure 3: Timer Angle and Timer Intensity in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation." width="384"><p class="caption">
+Figure 3: Timer Angle and Timer Intensity in T cells stimulated by
+antigen and analyzed at 4, 8, 12, and 16 hours after activation.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+</h2>
+<p><strong>TockyPrep</strong> provides a comprehensive suite of data
+preprocessing methods for deriving Timer Angle and Timer Intensity data.
+This suite includes Timer thresholding, Timer normalization, and
+trigonometric transformation. The resulting Timer Angle and Intensity
+data can be robustly used in downstream analyses.</p>
+<p>Please explore downstream analysis examples in <span class="citation">Bending, Martı́n, et al. (<a href="#ref-Bending2018JCB">2018</a>)</span>; <span class="citation">Bending, Paduraru, et al. (<a href="#ref-Bending2018EMBO">2018</a>)</span>; and <span class="citation">Hassan et al. (<a href="#ref-Hassan2022">2022</a>)</span>.</p>
+<p><img src="assets%2FTockyPrep.png" width="50%"></p>
 <p><img src="assets%2FMonoLab.jpg" width="30%"></p>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-Bending2018JCB" class="csl-entry">
+Bending, David, Paz Prieto Martı́n, Alina Paduraru, Catherine Ducker,
+Erik Marzaganov, Marie Laviron, Satsuki Kitano, Hitoshi Miyachi, Tessa
+Crompton, and Masahiro Ono. 2018. <span>“A Timer for Analyzing
+Temporally Dynamic Changes in Transcription During Differentiation in
+Vivo.”</span> <em>Journal of Cell Biology</em> 217 (8): 2931–50. <a href="https://rupress.org/jcb/article/217/8/2931/39442/A-timer-for-analyzing-temporally-dynamic-changes" class="external-link">https://rupress.org/jcb/article/217/8/2931/39442/A-timer-for-analyzing-temporally-dynamic-changes</a>.
+</div>
+<div id="ref-Bending2018EMBO" class="csl-entry">
+Bending, David, Alina Paduraru, Catherine B Ducker, Paz Prieto Martín,
+Tessa Crompton, and Masahiro Ono. 2018. <span>“A Temporally Dynamic
+Foxp3 Autoregulatory Transcriptional Circuit Controls the Effector Treg
+Programme.”</span> Journal Article. <em>The EMBO Journal</em> 37 (16):
+e99013. <a href="https://www.embopress.org/doi/full/10.15252/embj.201899013" class="external-link">https://www.embopress.org/doi/full/10.15252/embj.201899013</a>.
+</div>
+<div id="ref-Hassan2022" class="csl-entry">
+Hassan, Jehanne, Elizabeth Appleton, Bahire Kalfaoglu, Malin Pedersen,
+José Almeida-Santos, Hisashi Kanemaru, Nobuko Irie, et al. 2022.
+<span>“Single-Cell Level Temporal Profiling of Tumour-Reactive t Cells
+Under Immune Checkpoint Blockade.”</span> <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2022.07.19.500582" class="external-link">https://doi.org/10.1101/2022.07.19.500582</a>.
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
