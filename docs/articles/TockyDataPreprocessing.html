@@ -62,7 +62,7 @@
                         <h4 data-toc-skip class="author">Dr. Masahiro
 Ono</h4>
             
-            <h4 data-toc-skip class="date">2024-11-10</h4>
+            <h4 data-toc-skip class="date">2024-11-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/MonoTockyLab/TockyPrep/blob/HEAD/vignettes/TockyDataPreprocessing.Rmd" class="external-link"><code>vignettes/TockyDataPreprocessing.Rmd</code></a></small>
       <div class="d-none name"><code>TockyDataPreprocessing.Rmd</code></div>
@@ -70,7 +70,7 @@ Ono</h4>
 
     
     
-<p><img src="assets%2Fbannar.jpg" width="60%"></p>
+<p><img src="assets/bannar.jpg" width="60%"></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -100,7 +100,7 @@ normalization of immature and mature Timer fluorescence as a critical
 step for robust analysis. This approach is central to understanding the
 maturation dynamics of Timer proteins, and is implemented using advanced
 trigonometric transformations.</p>
-<p><img src="assets%2Foverview.jpg" width="60%"></p>
+<p><img src="assets/overview.jpg" width="60%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -168,7 +168,7 @@ values for individual cells.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalizing and transforming data</span></span>
 <span><span class="va">transformed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timer_transform.html">timer_transform</a></span><span class="op">(</span><span class="va">prep</span>, blue_channel <span class="op">=</span> <span class="st">'Timer.Blue'</span>, red_channel <span class="op">=</span> <span class="st">'Timer.Red'</span>, select <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="assets%2FTocky_sapling.jpg" width="30%"></p>
+<p><img src="assets/Tocky_sapling.jpg" width="30%"></p>
 </div>
 <div class="section level3">
 <h3 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
@@ -219,7 +219,7 @@ non-normalized Timer fluorescence.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logic</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">12</span>, <span class="fl">16</span><span class="op">)</span></span>
 <span><span class="va">samplefiles</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">file</span><span class="op">[</span><span class="va">logic</span><span class="op">]</span></span>
-<span><span class="fu">show</span><span class="op">(</span><span class="va">samplefiles</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">samplefiles</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "sample_12hrs_R1.csv" "sample_12hrs_R2.csv" "sample_12hrs_R3.csv"</span></span>
 <span><span class="co">##  [4] "sample_16hrs_R1.csv" "sample_16hrs_R2.csv" "sample_16hrs_R3.csv"</span></span>
 <span><span class="co">##  [7] "sample_4hrs_R1.csv"  "sample_4hrs_R2.csv"  "sample_4hrs_R3.csv" </span></span>
@@ -278,13 +278,13 @@ This suite includes Timer thresholding, Timer normalization, and
 trigonometric transformation. The resulting Timer Angle and Intensity
 data can be robustly used in downstream analyses.</p>
 <p>Please explore downstream analysis examples in <span class="citation">Bending, Martı́n, et al. (<a href="#ref-Bending2018JCB">2018</a>)</span>; <span class="citation">Bending, Paduraru, et al. (<a href="#ref-Bending2018EMBO">2018</a>)</span>; and <span class="citation">Hassan et al. (<a href="#ref-Hassan2022">2022</a>)</span>.</p>
-<p><img src="assets%2FTockyPrep.png" width="50%"></p>
-<p><img src="assets%2FMonoLab.jpg" width="30%"></p>
+<p><img src="assets/TockyPrep.png" width="50%"></p>
+<p><img src="assets/MonoLab.jpg" width="30%"></p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bending2018JCB" class="csl-entry">
 Bending, David, Paz Prieto Martı́n, Alina Paduraru, Catherine Ducker,
 Erik Marzaganov, Marie Laviron, Satsuki Kitano, Hitoshi Miyachi, Tessa
@@ -318,7 +318,7 @@ Under Immune Checkpoint Blockade.”</span> <em>bioRxiv</em>. <a href="https://d
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
