@@ -85,7 +85,14 @@ setClass(
 #' @importFrom methods initialize validObject
 #' @export
 setMethod("initialize", "TockyPrepData",
-  function(.Object, Data, cell_counts, sampledef, timer_fluorescence, input, normalization_parameters, Tocky) {
+  function(.Object,
+           Data = data.frame(),
+           cell_counts = data.frame(),
+           sampledef = list(),
+           timer_fluorescence = list(),
+           input = list(),
+           normalization_parameters = list(),
+           Tocky = list()) {
     .Object@Data <- Data
     .Object@cell_counts <- cell_counts
     .Object@sampledef <- sampledef
@@ -95,10 +102,10 @@ setMethod("initialize", "TockyPrepData",
     .Object@Tocky <- Tocky
 
     validObject(.Object)
-
     return(.Object)
   }
 )
+
 
 
 #' Show method for the TockyPrepData class
@@ -270,7 +277,7 @@ negfile = NULL, samplefile = NULL) {
 #'   result <- timer_transform(prep_data)
 #' }
 #'
-#' @importFrom utils read.csv
+#' @importFrom utils read.csv txtProgressBar setTxtProgressBar
 #' @importFrom grDevices rgb
 #' @importFrom methods new
 #' @importFrom graphics abline locator par
@@ -383,12 +390,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
             if (verbose) message("Automatic gating applied.")
         }
     }
-    if (verbose) {
-        message("Gating thresholds:")
-        message("red_threshold: ", red_threshold)
-        message("blue_threshold: ", blue_threshold)
-    }
-    
+
     gate_filter <- (neg$Red_log < red_threshold) & (neg$Blue_log < blue_threshold)
     neg_gated <- neg[gate_filter, ]
     
@@ -406,6 +408,12 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     dataset_list <- list()
     cellcount_total <- integer(length(samplefile))
     names(cellcount_total) <- samplefile
+    if(verbose){
+        progress <- txtProgressBar(min = 0, max = 100, style = 3)
+        progress_increment <- round(50/length(samplefile))
+        current_progress <- 0
+    }
+
     
     for (i in seq_along(samplefile)) {
         tmpdata <- read.csv(file.path(path, samplefile[i]),  header = TRUE)
@@ -422,7 +430,10 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         tmpdata[[red_channel_normalized]] <- tmpdata$Red_log
         
         dataset_list[[samplefile[i]]] <- tmpdata
-        if (verbose) message(paste("Processed sample file:", samplefile[i]))
+        if(verbose){
+            current_progress <- current_progress + progress_increment
+            setTxtProgressBar(progress, current_progress)
+        }
     }
     
     max_neg_blue <- max(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
@@ -436,14 +447,6 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         dispersion_blue <- sd(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
         dispersion_red <- sd(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
         dispersion_label <- "SD"
-    }
-
-    if (verbose) {
-        message("Normalization parameters:")
-        message("Max negative Blue: ", max_neg_blue)
-        message(sprintf("%s negative Blue: ", dispersion_label), dispersion_blue)
-        message("Max negative Red: ", max_neg_red)
-        message(sprintf("%s negative Red: ", dispersion_label), dispersion_red)
     }
 
     process_fluorescence <- function(B, R, maxB, sdB, maxR, sdR, applyNormalization = TRUE) {
@@ -460,6 +463,10 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         
         return(data.frame(Blue = B_normalized, Red = R_normalized))
     }
+    
+    if(verbose){
+        progress <- txtProgressBar(min = 0, max = 100, style = 3)
+    }
 
     result_all <- data.frame()
     
@@ -470,6 +477,8 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     MAD_blue <- mad(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
     MAD_red <- mad(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
 
+
+    
     for (sample_name in names(dataset_list)) {
         data_norm <- dataset_list[[sample_name]]
         
@@ -505,7 +514,11 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         )
 
         result_all <- rbind(result_all, result_df)
-        if (verbose) message(paste("Computed angle and intensity for:", sample_name))
+        
+        if(verbose){
+            current_progress <- current_progress + progress_increment
+            setTxtProgressBar(progress, current_progress)
+        }
     }
 
     sample_files <- unique(result_all$file)
@@ -557,6 +570,11 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
                   input = input_list,
                   normalization_parameters = normalization_parameters,
                   Tocky = list())
+    
+    if(verbose){
+        setTxtProgressBar(progress, 100)
+        close(progress)
+    }
     
     return(output)
 }
