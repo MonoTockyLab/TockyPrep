@@ -101,6 +101,8 @@ knitr::include_graphics('assets/Tocky_sapling.jpg')
 
 ## Visualization
 
+### Preparation: sample grouping definition
+
 To effectively visualize the processed data, sample grouping needs to be defined using `sample_definition`. The example file `sampledefinition.csv` provides the standard form. Use data.frame as input into `sample_definition`.
 
 ```{r sample_definition1, include=TRUE}
@@ -120,16 +122,30 @@ Alternatively, sample grouping can be created by choosing interaction session us
 
 ```
 
+
+
+### Confirming the gating of Timer fluorescence
+
+To visualize the thereshold values for Timer blue and red fluorescence, use `plot_timer_gating`.
+
+```{r plot_timer_gating, include=TRUE, fig.width=4, fig.height=4,  fig.cap="Figure 1: Thereshold values set for Timer blue and red fluorescence."}
+plot_timer_gating(prep = prep, x = transformed_data)
+
+```
+
+### Visualization of the processed Timer data
+
+
 To visualize the processed Timer data, use `plot_tocky`. This is a versatile function, enabling the three plot modes, including `'Timer fluorescence'`, `'Normalized Timer fluorescence'`, and `'Timer Angle and Intensity'`.
 
 - `'Timer fluorescence'`: Timer blue and red fluorescence, without normalization.
 - `'Normalized Timer fluorescence'`: Normalized and thrsholded Timer blue and red fluorescence.
 - `'Timer Angle and Intensity'`: Timer Angle and Intensity after trigonometric transformation.
 
-### Non-normalized Timer fluorescence (Figure 1)
+### Non-normalized Timer fluorescence (Figure 2)
 The default is `'Timer fluorescence'`, which is non-normalized Timer fluorescence.
 
-```{r plot_tocky_timer_fluorescence, fig.width=4, fig.height=4, fig.cap="Figure 1: Non-normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation."}
+```{r plot_tocky_timer_fluorescence, fig.width=4, fig.height=4, fig.cap="Figure 2: Non-normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation."}
 
 logic <- sample_definition$group %in% c(4, 8, 12, 16)
 samplefiles <- sample_definition$file[logic]
@@ -139,12 +155,12 @@ plot_tocky(transformed_data, interactive = FALSE, save = FALSE, n = 2, samplefil
 
 ```
 
-### Normalized Timer fluorescence (Figure 2)
+### Normalized Timer fluorescence (Figure 3)
 Using the option `plot_mode = "Normalized Timer fluorescence"`, you can visualize Normalized Timer blue and red fluorescence.
 
 
 
-```{r plot_tocky_normalized, fig.width=4, fig.height=4, fig.cap="Figure 2: Normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation."}
+```{r plot_tocky_normalized, fig.width=4, fig.height=4, fig.cap="Figure 3: Normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation."}
 # Visualizing the results
 plot_tocky(transformed_data, plot_mode = "Normalized Timer fluorescence", interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
 ```

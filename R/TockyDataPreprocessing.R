@@ -287,19 +287,19 @@ timer_transform <- function(prep, select = TRUE, blue_channel = NULL, red_channe
 red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose = TRUE, q = 0.998, normalization = TRUE) {
     
     input_list <- list(
-        path = prep$path,
-        select = select,
-        blue_channel = blue_channel,
-        red_channel = red_channel,
-        xlim_red = red_threshold,
-        ylim_blue = blue_threshold,
-        interactive_gating = interactive_gating,
-        verbose = verbose,
-        quantile = q,
-        normalization = normalization,
-        normalization_method = normalization_method
+    path = prep$path,
+    select = select,
+    blue_channel = blue_channel,
+    red_channel = red_channel,
+    xlim_red = red_threshold,
+    ylim_blue = blue_threshold,
+    interactive_gating = interactive_gating,
+    verbose = verbose,
+    quantile = q,
+    normalization = normalization,
+    normalization_method = normalization_method
     )
-        
+    
     if(!all(c("neg","path","samplefile", "variables") %in% names(prep))){
         stop("Use a correct prep input. \n")
     }
@@ -333,7 +333,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     if (verbose) {
         message("Blue channel: ", blue_channel)
         message("Red channel: ", red_channel)
-     }
+    }
     
     neg <- read.csv(file.path(path, negfile), header = TRUE)
     
@@ -344,107 +344,83 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     
     red_min_adjust <- -quantile(neg[[red_channel]], 0.005, na.rm = TRUE) + 100
     blue_min_adjust <- -quantile(neg[[blue_channel]], 0.005, na.rm = TRUE) + 100
-
+    
     red_log_colname <- ifelse("Red_log" %in% colnames(neg), paste("Red_log", "transformed", sep = "_"), "Red_log")
     blue_log_colname <- ifelse("Blue_log" %in% colnames(neg), paste("Blue_log", "transformed", sep = "_"), "Blue_log")
-
+    
     neg[[red_log_colname]] <- LogSingleData(neg[[red_channel]] + red_min_adjust)
     neg[[blue_log_colname]] <- LogSingleData(neg[[blue_channel]] + blue_min_adjust)
-
+    
     if (verbose) {
         if(red_log_colname != "Red_log" || blue_log_colname != "Blue_log") {
             message("Column names 'Red_log' or 'Blue_log' already exist. Renamed to ", red_log_colname, " and ", blue_log_colname, ".")
         }
         message("Processed Timer Fluorescence: ", red_log_colname, " and ", blue_log_colname)
     }
-        
-        if (is.null(red_threshold) || is.null(blue_threshold)) {
-            if (interactive_gating) {
-                repeat {
-                    if (verbose) message("Interactive gating started. Please click on the plot to set thresholds.")
-                    plot(neg$Red_log, neg$Blue_log, xlab='Timer Red (log)', ylab='Timer Blue (log)',
-                         pch='.', col=rgb(0,0,0,alpha=0.2))
-                    cat("Set a threshold for Blue and Red by clicking on the plot: \n")
-                    scalegate <- locator(type='p', col=2)
-
-                    if (length(scalegate$x) > 0 && length(scalegate$y) > 0) {
-                        red_threshold <- tail(scalegate$x, 1)
-                        blue_threshold <- tail(scalegate$y, 1)
-                        
-                        abline(v = red_threshold, h = blue_threshold, col=2)
-                        
-                        if (verbose) {
-                            message(paste("Gating thresholds tentatively set at red_threshold =", red_threshold,
-                                          "and blue_threshold =", blue_threshold))
-                        }
-
-                        ans2 <- askYesNo("Happy with your gating? Click 'Yes' to confirm or 'No' to reselect:")
-                        if (ans2) {
-                            break
-                        } else {
-                            if (verbose) message("Redo the gating process.")
-                        }
-                    } else {
-                        if (verbose) message("No point selected for gating thresholds, please try again.")
+    
+    if (is.null(red_threshold) || is.null(blue_threshold)) {
+        if (interactive_gating) {
+            repeat {
+                if (verbose) message("Interactive gating started. Please click on the plot to set thresholds.")
+                plot(neg$Red_log, neg$Blue_log, xlab='Timer Red (log)', ylab='Timer Blue (log)',
+                pch='.', col=rgb(0,0,0,alpha=0.2))
+                cat("Set a threshold for Blue and Red by clicking on the plot: \n")
+                scalegate <- locator(type='p', col=2)
+                
+                if (length(scalegate$x) > 0 && length(scalegate$y) > 0) {
+                    red_threshold <- tail(scalegate$x, 1)
+                    blue_threshold <- tail(scalegate$y, 1)
+                    
+                    abline(v = red_threshold, h = blue_threshold, col=2)
+                    
+                    if (verbose) {
+                        message(paste("Gating thresholds tentatively set at red_threshold =", red_threshold,
+                        "and blue_threshold =", blue_threshold))
                     }
+                    
+                    ans2 <- askYesNo("Happy with your gating? Click 'Yes' to confirm or 'No' to reselect:")
+                    if (ans2) {
+                        break
+                    } else {
+                        if (verbose) message("Redo the gating process.")
+                    }
+                } else {
+                    if (verbose) message("No point selected for gating thresholds, please try again.")
                 }
-            } else {
-                red_threshold <- quantile(neg$Red_log, q, na.rm = TRUE)
-                blue_threshold <- quantile(neg$Blue_log, q, na.rm = TRUE)
-                if (verbose) message("Automatic gating applied with thresholds at red_threshold =", red_threshold,
-                                     "and blue_threshold =", blue_threshold)
             }
+        } else {
+            red_threshold <- quantile(neg$Red_log, q, na.rm = TRUE)
+            blue_threshold <- quantile(neg$Blue_log, q, na.rm = TRUE)
+            if (verbose) message("Automatic gating applied with thresholds at red_threshold =", red_threshold,
+            "and blue_threshold =", blue_threshold)
         }
-
+    }
+    
     gate_filter <- (neg$Red_log < red_threshold) & (neg$Blue_log < blue_threshold)
     neg_gated <- neg[gate_filter, ]
     
     if (nrow(neg_gated) == 0) {
         stop("No data points remain after gating. Please adjust the gating thresholds.")
     }
-
-    quadrant_gate <- function(df, x_point, y_point, var_x_name, var_y_name) {
-      x_col <- df[[var_x_name]]
-      y_col <- df[[var_y_name]]
-
-      q1 <- (x_col < x_point & y_col >= y_point)
-      q2 <- (x_col >= x_point & y_col >= y_point)
-      q3 <- (x_col >= x_point & y_col < y_point)
-      q4 <- (x_col < x_point & y_col < y_point)
-
-      list(
-        Q1 = list(logical.gate = q1),
-        Q2 = list(logical.gate = q2),
-        Q3 = list(logical.gate = q3),
-        Q4 = list(logical.gate = q4)
-      )
-    }
-
-    logic_to_Percent <- function(logical_vector) {
-      valid_count <- sum(!is.na(logical_vector))
-      if (valid_count == 0) stop("All values are NA or empty.")
-      true_count <- sum(logical_vector, na.rm = TRUE)
-      100 * true_count / valid_count
-    }
-
-
+    
+    
     if (interactive_gating) {
-      Q <- quadrant_gate(neg, x_point = red_threshold, y_point = blue_threshold, var_x_name = 'Red_log', var_y_name = 'Blue_log')
-      
-      cat("Percentage of cells in each quadrant:\n")
-      for (k in 1:4) {
-        quadrant <- Q[[paste0("Q", k)]]
-        neg_Q_perc <- logic_to_Percent(quadrant$logical.gate)
-        neg_Q_perc <- round(neg_Q_perc, 4)
-        cat(paste('Q', k, ': ', neg_Q_perc, '%\n', sep = ''))
-      }
+        Q <- quadrant_gate(neg, x_point = red_threshold, y_point = blue_threshold, var_x_name = 'Red_log', var_y_name = 'Blue_log')
+        
+        cat("Percentage of cells in each quadrant:\n")
+        for (k in 1:4) {
+            quadrant <- Q[[paste0("Q", k)]]
+            neg_Q_perc <- logic_to_Percent(quadrant$logical.gate)
+            neg_Q_perc <- round(neg_Q_perc, 4)
+            cat(paste('Q', k, ': ', neg_Q_perc, '%\n', sep = ''))
+        }
     }
-
+    
     
     
     blue_channel_normalized <- "Blue_Normalized"
     red_channel_normalized <- "Red_Normalized"
-
+    
     neg_normalized <- neg
     neg_normalized[[blue_channel_normalized]] <- neg$Blue_log
     neg_normalized[[red_channel_normalized]] <- neg$Red_log
@@ -457,7 +433,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         progress_increment <- round(50/length(samplefile))
         current_progress <- 0
     }
-
+    
     
     for (i in seq_along(samplefile)) {
         tmpdata <- read.csv(file.path(path, samplefile[i]),  header = TRUE)
@@ -482,7 +458,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     
     max_neg_blue <- max(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
     max_neg_red <- max(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
-
+    
     if (normalization_method == "MAD") {
         dispersion_blue <- mad(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
         dispersion_red <- mad(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
@@ -492,16 +468,16 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         dispersion_red <- sd(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
         dispersion_label <- "SD"
     }
-
+    
     process_fluorescence <- function(B, R, maxB, sdB, maxR, sdR, applyNormalization = TRUE) {
         B_normalized <- pmax(B, maxB)
         R_normalized <- pmax(R, maxR)
-
+        
         if (applyNormalization) {
             B_normalized <- (B_normalized - maxB) / sdB
             R_normalized <- (R_normalized - maxR) / sdR
         } else {
-             B_normalized <- B_normalized - maxB
+            B_normalized <- B_normalized - maxB
             R_normalized <- R_normalized - maxR
         }
         
@@ -511,7 +487,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     if(verbose){
         progress <- txtProgressBar(min = 0, max = 100, style = 3)
     }
-
+    
     result_all <- data.frame()
     
     max_neg_blue <- max(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
@@ -520,8 +496,8 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     sd_red <- sd(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
     MAD_blue <- mad(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
     MAD_red <- mad(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
-
-
+    
+    
     
     for (sample_name in names(dataset_list)) {
         data_norm <- dataset_list[[sample_name]]
@@ -533,15 +509,15 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         }
         
         norm_values <- process_fluorescence(
-            B = data_norm[[blue_channel_normalized]],
-            R = data_norm[[red_channel_normalized]],
-            maxB = max_neg_blue,
-            sdB = scale_parameters$sdB,
-            maxR = max_neg_red,
-            sdR = scale_parameters$sdR,
-            applyNormalization = normalization
+        B = data_norm[[blue_channel_normalized]],
+        R = data_norm[[red_channel_normalized]],
+        maxB = max_neg_blue,
+        sdB = scale_parameters$sdB,
+        maxR = max_neg_red,
+        sdR = scale_parameters$sdR,
+        applyNormalization = normalization
         )
-
+        
         data_norm[[blue_channel_normalized]] <- norm_values$Blue
         data_norm[[red_channel_normalized]] <- norm_values$Red
         
@@ -550,13 +526,13 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         angle_deg <- angle_rad * 180 / pi
         
         result_df <- data.frame(
-            file = sample_name,
-            Angle = angle_deg,
-            Intensity = intensity,
-            data_norm,
-            norm_values
+        file = sample_name,
+        Angle = angle_deg,
+        Intensity = intensity,
+        data_norm,
+        norm_values
         )
-
+        
         result_all <- rbind(result_all, result_df)
         
         if(verbose){
@@ -564,7 +540,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
             setTxtProgressBar(progress, current_progress)
         }
     }
-
+    
     sample_files <- unique(result_all$file)
     
     sampledef_df <- data.frame(
@@ -573,48 +549,48 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     stringsAsFactors = FALSE
     )
     sampledef <- list(sampledef = sampledef_df)
-
+    
     if (normalization) {
         normalization_parameters <- list(
-            blue_added = blue_min_adjust,
-            red_added = red_min_adjust,
-            red_threshold = red_threshold,
-            blue_threshold = blue_threshold,
-            max_neg_blue = max_neg_blue,
-            max_neg_red = max_neg_red,
-            SD_blue = sd_blue,
-            SD_red = sd_red,
-            MAD_blue = MAD_blue,
-            MAD_red = MAD_red,
-            blue_channel_normalized = blue_channel_normalized,
-            red_channel_normalized = red_channel_normalized
+        blue_added = blue_min_adjust,
+        red_added = red_min_adjust,
+        red_threshold = red_threshold,
+        blue_threshold = blue_threshold,
+        max_neg_blue = max_neg_blue,
+        max_neg_red = max_neg_red,
+        SD_blue = sd_blue,
+        SD_red = sd_red,
+        MAD_blue = MAD_blue,
+        MAD_red = MAD_red,
+        blue_channel_normalized = blue_channel_normalized,
+        red_channel_normalized = red_channel_normalized
         )
     } else {
         normalization_parameters <- list(
-            blue_added = blue_min_adjust,
-            red_added = red_min_adjust,
-            red_threshold = red_threshold,
-            blue_threshold = blue_threshold
+        blue_added = blue_min_adjust,
+        red_added = red_min_adjust,
+        red_threshold = red_threshold,
+        blue_threshold = blue_threshold
         )
-     }
+    }
     
     timer_fluorescence <- list(original_blue_channel = blue_channel, original_red_channel = red_channel,
     blue_channel = blue_log_colname, red_channel = red_log_colname)
-
+    
     cell_counts <- data.frame(
-            sample = names(cellcount_total),
-            cell_count = cellcount_total,
-            stringsAsFactors = FALSE
-        )
+    sample = names(cellcount_total),
+    cell_count = cellcount_total,
+    stringsAsFactors = FALSE
+    )
     
     output <- new("TockyPrepData",
-                  Data = result_all,
-                  cell_counts = cell_counts,
-                  sampledef = sampledef,
-                  timer_fluorescence = timer_fluorescence,
-                  input = input_list,
-                  normalization_parameters = normalization_parameters,
-                  Tocky = list())
+    Data = result_all,
+    cell_counts = cell_counts,
+    sampledef = sampledef,
+    timer_fluorescence = timer_fluorescence,
+    input = input_list,
+    normalization_parameters = normalization_parameters,
+    Tocky = list())
     
     if(verbose){
         setTxtProgressBar(progress, 100)
@@ -735,7 +711,6 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
 #' }
 
 plot_timer_gating <- function(prep, x){
-    
     negfile <- prep$neg
     path <- prep$path
     red_threshold <- x@normalization_parameters$red_threshold
@@ -753,10 +728,6 @@ plot_timer_gating <- function(prep, x){
     
     red_min_adjust <- -quantile(neg[[red_channel]], 0.005, na.rm = TRUE) + 100
     blue_min_adjust <- -quantile(neg[[blue_channel]], 0.005, na.rm = TRUE) + 100
-    
-    
-
-    
     red_log_colname <- ifelse("Red_log" %in% colnames(neg), paste("Red_log", "transformed", sep = "_"), "Red_log")
     blue_log_colname <- ifelse("Blue_log" %in% colnames(neg), paste("Blue_log", "transformed", sep = "_"), "Blue_log")
     
@@ -768,6 +739,19 @@ plot_timer_gating <- function(prep, x){
     pch='.', col=rgb(0,0,0,alpha=0.2))
     
     abline(v = red_threshold, h = blue_threshold, col=2)
+    
+    Q <- quadrant_gate(neg, x_point = red_threshold, y_point = blue_threshold, var_x_name = 'Red_log', var_y_name = 'Blue_log')
+    
+    cat("Percentage of cells in each quadrant:\n")
+    for (k in 1:4) {
+      quadrant <- Q[[paste0("Q", k)]]
+      neg_Q_perc <- logic_to_Percent(quadrant$logical.gate)
+      neg_Q_perc <- round(neg_Q_perc, 4)
+      cat(paste('Q', k, ': ', neg_Q_perc, '%\n', sep = ''))
+      }
+
+    return(invisible(quadrant))
+      
 }
 
 
@@ -794,4 +778,78 @@ LogSingleData <- function(x){
     x.log[lg] <- log10(x.log[lg])
     x.log[!lg] <- 0
     return(x.log)
+}
+
+
+#' Calculate Quadrant Gating Logic
+#'
+#' Determines which quadrant each point in a dataset falls into based on specified x and y thresholds.
+#'
+#' @param df A data frame containing the fluorescence data.
+#' @param x_point The numeric threshold for the x-axis (e.g., Red fluorescence).
+#' @param y_point The numeric threshold for the y-axis (e.g., Blue fluorescence).
+#' @param var_x_name The name of the x-axis variable in `df`.
+#' @param var_y_name The name of the y-axis variable in `df`.
+#'
+#' @return A list containing logical vectors for each quadrant:
+#'   \itemize{
+#'     \item \code{Q1}: Points below `x_point` and above or equal to `y_point`.
+#'     \item \code{Q2}: Points above or equal to `x_point` and above or equal to `y_point`.
+#'     \item \code{Q3}: Points above or equal to `x_point` and below `y_point`.
+#'     \item \code{Q4}: Points below `x_point` and below `y_point`.
+#'   }
+#'
+#' @details This function is intended for internal use to assist in categorizing cells into quadrants
+#' based on fluorescence gating thresholds. It helps in further analysis such as determining the
+#' percentage of cells within each quadrant.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#'   df <- data.frame(Red = rnorm(100, 50, 10), Blue = rnorm(100, 50, 10))
+#'   quadrant_data <- quadrant_gate(df, x_point = 50, y_point = 50, var_x_name = "Red", var_y_name = "Blue")
+#' }
+quadrant_gate <- function(df, x_point, y_point, var_x_name, var_y_name) {
+    x_col <- df[[var_x_name]]
+    y_col <- df[[var_y_name]]
+    
+    q1 <- (x_col < x_point & y_col >= y_point)
+    q2 <- (x_col >= x_point & y_col >= y_point)
+    q3 <- (x_col >= x_point & y_col < y_point)
+    q4 <- (x_col < x_point & y_col < y_point)
+    
+    list(
+    Q1 = list(logical.gate = q1),
+    Q2 = list(logical.gate = q2),
+    Q3 = list(logical.gate = q3),
+    Q4 = list(logical.gate = q4)
+    )
+}
+
+#' Convert Logical Vector to Percentage
+#'
+#' Calculates the percentage of TRUE values in a logical vector, excluding NA values.
+#'
+#' @param logical_vector A logical vector where TRUE represents a condition met (e.g., a cell falling within a certain quadrant).
+#'
+#' @return A numeric value representing the percentage of TRUE values in the vector.
+#'
+#' @details This function is used internally to calculate the percentage of data points that meet a specific condition,
+#' such as being within a specific gating quadrant. It excludes NA values from the calculation to ensure accuracy.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' \dontrun{
+#'   logical_vector <- c(TRUE, FALSE, NA, TRUE, FALSE, TRUE)
+#'   percent_true <- logic_to_Percent(logical_vector)
+#'   # percent_true will output 50 (3 TRUE out of 6 total, with 1 NA excluded)
+#' }
+logic_to_Percent <- function(logical_vector) {
+    valid_count <- sum(!is.na(logical_vector))
+    if (valid_count == 0) stop("All values are NA or empty.")
+    true_count <- sum(logical_vector, na.rm = TRUE)
+    out <- 100 * true_count / valid_count
+    return(out)
 }

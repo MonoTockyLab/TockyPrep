@@ -8,8 +8,8 @@
 <title>TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Timer Analysis • TockyPrep</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Timer Analysis">
 <meta name="google-site-verification" content="Pj4WWF5m9cqCcPqkGG75BI1_593zXImuFRpI8TnAous">
 </head>
@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">TockyPrep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,7 @@
                         <h4 data-toc-skip class="author">Dr. Masahiro
 Ono</h4>
             
-            <h4 data-toc-skip class="date">2024-11-16</h4>
+            <h4 data-toc-skip class="date">2024-11-20</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/MonoTockyLab/TockyPrep/blob/HEAD/vignettes/TockyDataPreprocessing.Rmd" class="external-link"><code>vignettes/TockyDataPreprocessing.Rmd</code></a></small>
       <div class="d-none name"><code>TockyDataPreprocessing.Rmd</code></div>
@@ -70,7 +70,7 @@ Ono</h4>
 
     
     
-<p><img src="assets%2Fbannar.jpg" width="60%"></p>
+<p><img src="assets/bannar.jpg" width="60%"></p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -100,7 +100,7 @@ normalization of immature and mature Timer fluorescence as a critical
 step for robust analysis. This approach is central to understanding the
 maturation dynamics of Timer proteins, and is implemented using advanced
 trigonometric transformations.</p>
-<p><img src="assets%2Foverview.jpg" width="60%"></p>
+<p><img src="assets/overview.jpg" width="60%"></p>
 </div>
 </div>
 <div class="section level2">
@@ -168,11 +168,14 @@ values for individual cells.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Normalizing and transforming data</span></span>
 <span><span class="va">transformed_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/timer_transform.html">timer_transform</a></span><span class="op">(</span><span class="va">prep</span>, blue_channel <span class="op">=</span> <span class="st">'Timer.Blue'</span>, red_channel <span class="op">=</span> <span class="st">'Timer.Red'</span>, select <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="assets%2FTocky_sapling.jpg" width="30%"></p>
+<p><img src="assets/Tocky_sapling.jpg" width="30%"></p>
 </div>
 <div class="section level3">
 <h3 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
 </h3>
+<div class="section level4">
+<h4 id="preparation-sample-grouping-definition">Preparation: sample grouping definition<a class="anchor" aria-label="anchor" href="#preparation-sample-grouping-definition"></a>
+</h4>
 <p>To effectively visualize the processed data, sample grouping needs to
 be defined using <code>sample_definition</code>. The example file
 <code>sampledefinition.csv</code> provides the standard form. Use
@@ -195,6 +198,29 @@ data.frame as input into <code>sample_definition</code>.</p>
 <p>Alternatively, sample grouping can be created by choosing interaction
 session using the option <code>interactive = TRUE</code>. This will
 prompt generation of sample_definition.csv in your output directory.</p>
+</div>
+<div class="section level4">
+<h4 id="confirming-the-gating-of-timer-fluorescence">Confirming the gating of Timer fluorescence<a class="anchor" aria-label="anchor" href="#confirming-the-gating-of-timer-fluorescence"></a>
+</h4>
+<p>To visualize the thereshold values for Timer blue and red
+fluorescence, use <code>plot_timer_gating</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_timer_gating.html">plot_timer_gating</a></span><span class="op">(</span>prep <span class="op">=</span> <span class="va">prep</span>, x <span class="op">=</span> <span class="va">transformed_data</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "FSC.A"      "Timer.Blue" "Timer.Red"</span></span></code></pre>
+<div class="figure">
+<img src="TockyDataPreprocessing_files/figure-html/plot_timer_gating-1.png" alt="Figure 1: Thereshold values set for Timer blue and red fluorescence." width="384"><p class="caption">
+Figure 1: Thereshold values set for Timer blue and red fluorescence.
+</p>
+</div>
+<pre><code><span><span class="co">## Percentage of cells in each quadrant:</span></span>
+<span><span class="co">## Q1: 0.2029%</span></span>
+<span><span class="co">## Q2: 0%</span></span>
+<span><span class="co">## Q3: 0.2029%</span></span>
+<span><span class="co">## Q4: 99.5941%</span></span></code></pre>
+</div>
+<div class="section level4">
+<h4 id="visualization-of-the-processed-timer-data">Visualization of the processed Timer data<a class="anchor" aria-label="anchor" href="#visualization-of-the-processed-timer-data"></a>
+</h4>
 <p>To visualize the processed Timer data, use <code>plot_tocky</code>.
 This is a versatile function, enabling the three plot modes, including
 <code>'Timer fluorescence'</code>,
@@ -211,12 +237,13 @@ thrsholded Timer blue and red fluorescence.</li>
 <code>'Timer Angle and Intensity'</code>: Timer Angle and Intensity
 after trigonometric transformation.</li>
 </ul>
+</div>
 <div class="section level4">
-<h4 id="non-normalized-timer-fluorescence-figure-1">Non-normalized Timer fluorescence (Figure 1)<a class="anchor" aria-label="anchor" href="#non-normalized-timer-fluorescence-figure-1"></a>
+<h4 id="non-normalized-timer-fluorescence-figure-2">Non-normalized Timer fluorescence (Figure 2)<a class="anchor" aria-label="anchor" href="#non-normalized-timer-fluorescence-figure-2"></a>
 </h4>
 <p>The default is <code>'Timer fluorescence'</code>, which is
 non-normalized Timer fluorescence.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">logic</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">8</span>, <span class="fl">12</span>, <span class="fl">16</span><span class="op">)</span></span>
 <span><span class="va">samplefiles</span> <span class="op">&lt;-</span> <span class="va">sample_definition</span><span class="op">$</span><span class="va">file</span><span class="op">[</span><span class="va">logic</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/methods/show.html" class="external-link">show</a></span><span class="op">(</span><span class="va">samplefiles</span><span class="op">)</span></span></code></pre></div>
@@ -224,28 +251,28 @@ non-normalized Timer fluorescence.</p>
 <span><span class="co">##  [4] "sample_16hrs_R1.csv" "sample_16hrs_R2.csv" "sample_16hrs_R3.csv"</span></span>
 <span><span class="co">##  [7] "sample_4hrs_R1.csv"  "sample_4hrs_R2.csv"  "sample_4hrs_R3.csv" </span></span>
 <span><span class="co">## [10] "sample_8hrs_R1.csv"  "sample_8hrs_R2.csv"  "sample_8hrs_R3.csv"</span></span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="TockyDataPreprocessing_files/figure-html/plot_tocky_timer_fluorescence-1.png" alt="Figure 1: Non-normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation." width="384"><p class="caption">
-Figure 1: Non-normalized Timer Fluorescence in T cells stimulated by
+<img src="TockyDataPreprocessing_files/figure-html/plot_tocky_timer_fluorescence-1.png" alt="Figure 2: Non-normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation." width="384"><p class="caption">
+Figure 2: Non-normalized Timer Fluorescence in T cells stimulated by
 antigen and analyzed at 4, 8, 12, and 16 hours after activation.
 </p>
 </div>
 </div>
 <div class="section level4">
-<h4 id="normalized-timer-fluorescence-figure-2">Normalized Timer fluorescence (Figure 2)<a class="anchor" aria-label="anchor" href="#normalized-timer-fluorescence-figure-2"></a>
+<h4 id="normalized-timer-fluorescence-figure-3">Normalized Timer fluorescence (Figure 3)<a class="anchor" aria-label="anchor" href="#normalized-timer-fluorescence-figure-3"></a>
 </h4>
 <p>Using the option
 <code>plot_mode = "Normalized Timer fluorescence"</code>, you can
 visualize Normalized Timer blue and red fluorescence.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Normalized Timer fluorescence"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
-<img src="TockyDataPreprocessing_files/figure-html/plot_tocky_normalized-1.png" alt="Figure 2: Normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation." width="384"><p class="caption">
-Figure 2: Normalized Timer Fluorescence in T cells stimulated by antigen
+<img src="TockyDataPreprocessing_files/figure-html/plot_tocky_normalized-1.png" alt="Figure 3: Normalized Timer Fluorescence in T cells stimulated by antigen and analyzed at 4, 8, 12, and 16 hours after activation." width="384"><p class="caption">
+Figure 3: Normalized Timer Fluorescence in T cells stimulated by antigen
 and analyzed at 4, 8, 12, and 16 hours after activation.
 </p>
 </div>
@@ -257,7 +284,7 @@ and analyzed at 4, 8, 12, and 16 hours after activation.
 <code>plot_mode = "Timer Angle and Intensity"</code>, you can visualize
 the effects of the trigonometric transformation applied to the
 normalized data.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualizing the results</span></span>
 <span><span class="fu"><a href="../reference/plot_tocky.html">plot_tocky</a></span><span class="op">(</span><span class="va">transformed_data</span>, plot_mode <span class="op">=</span> <span class="st">"Timer Angle and Intensity"</span>, interactive <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, n <span class="op">=</span> <span class="fl">2</span>, samplefile <span class="op">=</span> <span class="va">samplefiles</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
@@ -278,13 +305,13 @@ This suite includes Timer thresholding, Timer normalization, and
 trigonometric transformation. The resulting Timer Angle and Intensity
 data can be robustly used in downstream analyses.</p>
 <p>Please explore downstream analysis examples in <span class="citation">Bending, Martı́n, et al. (<a href="#ref-Bending2018JCB">2018</a>)</span>; <span class="citation">Bending, Paduraru, et al. (<a href="#ref-Bending2018EMBO">2018</a>)</span>; and <span class="citation">Hassan et al. (<a href="#ref-Hassan2022">2022</a>)</span>.</p>
-<p><img src="assets%2FTockyPrep.png" width="50%"></p>
-<p><img src="assets%2FMonoLab.jpg" width="30%"></p>
+<p><img src="assets/TockyPrep.png" width="50%"></p>
+<p><img src="assets/MonoLab.jpg" width="30%"></p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Bending2018JCB" class="csl-entry">
 Bending, David, Paz Prieto Martı́n, Alina Paduraru, Catherine Ducker,
 Erik Marzaganov, Marie Laviron, Satsuki Kitano, Hitoshi Miyachi, Tessa
@@ -318,7 +345,7 @@ Under Immune Checkpoint Blockade.”</span> <em>bioRxiv</em>. <a href="https://d
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
 </div>
 
     </footer>
