@@ -299,15 +299,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         normalization = normalization,
         normalization_method = normalization_method
     )
-    
-    LogSingleData <- function(x){
-        x.log <- x
-        lg <- x.log > 1
-        x.log[lg] <- log10(x.log[lg])
-        x.log[!lg] <- 0
-        return(x.log)
-    }
-    
+        
     if(!all(c("neg","path","samplefile", "variables") %in% names(prep))){
         stop("Use a correct prep input. \n")
     }
@@ -352,12 +344,10 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     
     red_min_adjust <- -quantile(neg[[red_channel]], 0.005, na.rm = TRUE) + 100
     blue_min_adjust <- -quantile(neg[[blue_channel]], 0.005, na.rm = TRUE) + 100
-    
-    # New column names
+
     red_log_colname <- ifelse("Red_log" %in% colnames(neg), paste("Red_log", "transformed", sep = "_"), "Red_log")
     blue_log_colname <- ifelse("Blue_log" %in% colnames(neg), paste("Blue_log", "transformed", sep = "_"), "Blue_log")
 
-    # Log transform and assign to new columns
     neg[[red_log_colname]] <- LogSingleData(neg[[red_channel]] + red_min_adjust)
     neg[[blue_log_colname]] <- LogSingleData(neg[[blue_channel]] + blue_min_adjust)
 
@@ -368,28 +358,43 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         message("Processed Timer Fluorescence: ", red_log_colname, " and ", blue_log_colname)
     }
         
-    if (is.null(red_threshold) || is.null(blue_threshold)) {
-        if (interactive_gating) {
-            if (verbose) message("Interactive gating started. Please click on the plot to set thresholds.")
-            plot(neg$Red_log, neg$Blue_log, xlab='Timer Red (log)', ylab='Timer Blue (log)',
-            pch='.', col=rgb(0,0,0,alpha=0.2))
-            cat("Set a threshold for Blue and Red by clicking on the plot: \n")
-            scalegate <- locator(n = 1, type = 'p', col=2)
-            if (!is.null(scalegate)) {
-                red_threshold <- scalegate$x
-                blue_threshold <- scalegate$y
-                abline(v = red_threshold, h = blue_threshold, col=2)
-                if (verbose) message(paste("Gating thresholds set at red_threshold =", red_threshold,
-                "and blue_threshold =", blue_threshold))
+        if (is.null(red_threshold) || is.null(blue_threshold)) {
+            if (interactive_gating) {
+                repeat {
+                    if (verbose) message("Interactive gating started. Please click on the plot to set thresholds.")
+                    plot(neg$Red_log, neg$Blue_log, xlab='Timer Red (log)', ylab='Timer Blue (log)',
+                         pch='.', col=rgb(0,0,0,alpha=0.2))
+                    cat("Set a threshold for Blue and Red by clicking on the plot: \n")
+                    scalegate <- locator(type='p', col=2)
+
+                    if (length(scalegate$x) > 0 && length(scalegate$y) > 0) {
+                        red_threshold <- tail(scalegate$x, 1)
+                        blue_threshold <- tail(scalegate$y, 1)
+                        
+                        abline(v = red_threshold, h = blue_threshold, col=2)
+                        
+                        if (verbose) {
+                            message(paste("Gating thresholds tentatively set at red_threshold =", red_threshold,
+                                          "and blue_threshold =", blue_threshold))
+                        }
+
+                        ans2 <- askYesNo("Happy with your gating? Click 'Yes' to confirm or 'No' to reselect:")
+                        if (ans2) {
+                            break
+                        } else {
+                            if (verbose) message("Redo the gating process.")
+                        }
+                    } else {
+                        if (verbose) message("No point selected for gating thresholds, please try again.")
+                    }
+                }
             } else {
-                stop("No point selected for gating thresholds.")
+                red_threshold <- quantile(neg$Red_log, q, na.rm = TRUE)
+                blue_threshold <- quantile(neg$Blue_log, q, na.rm = TRUE)
+                if (verbose) message("Automatic gating applied with thresholds at red_threshold =", red_threshold,
+                                     "and blue_threshold =", blue_threshold)
             }
-        } else {
-            red_threshold <- quantile(neg$Red_log, q, na.rm = TRUE)
-            blue_threshold <- quantile(neg$Blue_log, q, na.rm = TRUE)
-            if (verbose) message("Automatic gating applied.")
         }
-    }
 
     gate_filter <- (neg$Red_log < red_threshold) & (neg$Blue_log < blue_threshold)
     neg_gated <- neg[gate_filter, ]
@@ -397,6 +402,45 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     if (nrow(neg_gated) == 0) {
         stop("No data points remain after gating. Please adjust the gating thresholds.")
     }
+
+    quadrant_gate <- function(df, x_point, y_point, var_x_name, var_y_name) {
+      x_col <- df[[var_x_name]]
+      y_col <- df[[var_y_name]]
+
+      q1 <- (x_col < x_point & y_col >= y_point)
+      q2 <- (x_col >= x_point & y_col >= y_point)
+      q3 <- (x_col >= x_point & y_col < y_point)
+      q4 <- (x_col < x_point & y_col < y_point)
+
+      list(
+        Q1 = list(logical.gate = q1),
+        Q2 = list(logical.gate = q2),
+        Q3 = list(logical.gate = q3),
+        Q4 = list(logical.gate = q4)
+      )
+    }
+
+    logic_to_Percent <- function(logical_vector) {
+      valid_count <- sum(!is.na(logical_vector))
+      if (valid_count == 0) stop("All values are NA or empty.")
+      true_count <- sum(logical_vector, na.rm = TRUE)
+      100 * true_count / valid_count
+    }
+
+
+    if (interactive_gating) {
+      Q <- quadrant_gate(neg, x_point = red_threshold, y_point = blue_threshold, var_x_name = 'Red_log', var_y_name = 'Blue_log')
+      
+      cat("Percentage of cells in each quadrant:\n")
+      for (k in 1:4) {
+        quadrant <- Q[[paste0("Q", k)]]
+        neg_Q_perc <- logic_to_Percent(quadrant$logical.gate)
+        neg_Q_perc <- round(neg_Q_perc, 4)
+        cat(paste('Q', k, ': ', neg_Q_perc, '%\n', sep = ''))
+      }
+    }
+
+    
     
     blue_channel_normalized <- "Blue_Normalized"
     red_channel_normalized <- "Red_Normalized"
@@ -554,7 +598,8 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         )
      }
     
-    timer_fluorescence <- list(blue_channel = blue_log_colname, red_channel = red_log_colname)
+    timer_fluorescence <- list(original_blue_channel = blue_channel, original_red_channel = red_channel,
+    blue_channel = blue_log_colname, red_channel = red_log_colname)
 
     cell_counts <- data.frame(
             sample = names(cellcount_total),
@@ -664,3 +709,89 @@ sample_definition <- function(x, sample_definition = NULL, output_dir = NULL, fi
   return(x)
 }
 
+
+
+#' Plot Timer Gating Confirmation
+#'
+#' Generates a plot of the negative control data with gating thresholds overlaid, allowing for visual confirmation of gating parameters used during the timer transformation process.
+#'
+#' @param prep A list containing file paths and variables, typically the output from \code{\link{prep_tocky}}. It must include:
+#'   \itemize{
+#'     \item \code{neg}: Character string specifying the negative control file name.
+#'     \item \code{path}: Character string specifying the directory path to data files.
+#'   }
+#' @param x A \code{TockyPrepData} object resulting from \code{\link{timer_transform}}, containing processed data and normalization parameters, including gating thresholds.
+#'
+#' @details This function reads the negative control data specified in \code{prep}, applies logarithmic transformation to the Timer Red and Timer Blue fluorescence channels, and plots \code{Red_log} versus \code{Blue_log} values. The gating thresholds extracted from the \code{TockyPrepData} object \code{x} are overlaid on the plot as vertical and horizontal lines. This allows users to visually confirm the gating thresholds applied during the data normalization process.
+#'
+#' @return This function generates a plot; it does not return a value.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # Assuming 'prep_data' is the output from 'prep_tocky' and 'tocky_data' is the TockyPrepData object
+#' plot_timer_gating(prep = prep_data, x = tocky_data)
+#' }
+
+plot_timer_gating <- function(prep, x){
+    
+    negfile <- prep$neg
+    path <- prep$path
+    red_threshold <- x@normalization_parameters$red_threshold
+    blue_threshold <- x@normalization_parameters$blue_threshold
+    neg <- read.csv(file.path(path, negfile), header = TRUE)
+    blue_channel <-  x@timer_fluorescence$original_blue_channel
+    red_channel <-  x@timer_fluorescence$original_red_channel
+    neg <- read.csv(file.path(path, negfile), header = TRUE)
+
+    show(colnames(neg))
+    required_channels <- c(blue_channel, red_channel)
+    if (!all(required_channels %in% colnames(neg))) {
+        stop("Not all required channels are present in the negative control data.")
+    }
+    
+    red_min_adjust <- -quantile(neg[[red_channel]], 0.005, na.rm = TRUE) + 100
+    blue_min_adjust <- -quantile(neg[[blue_channel]], 0.005, na.rm = TRUE) + 100
+    
+    
+
+    
+    red_log_colname <- ifelse("Red_log" %in% colnames(neg), paste("Red_log", "transformed", sep = "_"), "Red_log")
+    blue_log_colname <- ifelse("Blue_log" %in% colnames(neg), paste("Blue_log", "transformed", sep = "_"), "Blue_log")
+    
+    neg[[red_log_colname]] <- LogSingleData(neg[[red_channel]] + red_min_adjust)
+    neg[[blue_log_colname]] <- LogSingleData(neg[[blue_channel]] + blue_min_adjust)
+    
+    
+    plot(neg$Red_log, neg$Blue_log, xlab='Timer Red (log)', ylab='Timer Blue (log)',
+    pch='.', col=rgb(0,0,0,alpha=0.2))
+    
+    abline(v = red_threshold, h = blue_threshold, col=2)
+}
+
+
+#' Logarithmic Transformation of Fluorescence Data
+#'
+#' Applies a custom logarithmic transformation to fluorescence intensity data, transforming values greater than 1 using a base-10 logarithm and setting values less than or equal to 1 to zero.
+#'
+#' @param x A numeric vector of fluorescence intensity values to be transformed.
+#'
+#' @return A numeric vector containing the transformed fluorescence intensity values.
+#'
+#' @details This function is used internally to transform fluorescence intensity data. It ensures that non-positive values (which cannot be log-transformed) are set to zero, while positive values greater than 1 are log-transformed using base 10. This helps in handling data with a wide range of values and avoids issues with undefined logarithms.
+#'
+#' @keywords internal
+#'
+#' @examples
+#' # Example usage:
+#' fluorescence_values <- c(0.5, 1, 2, 10)
+#' transformed_values <- LogSingleData(fluorescence_values)
+#' # transformed_values will be: c(0, 0, log10(2), log10(10))
+LogSingleData <- function(x){
+    x.log <- x
+    lg <- x.log > 1
+    x.log[lg] <- log10(x.log[lg])
+    x.log[!lg] <- 0
+    return(x.log)
+}
