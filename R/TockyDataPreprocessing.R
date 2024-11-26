@@ -398,6 +398,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     
     gate_filter <- (neg$Red_log < red_threshold) & (neg$Blue_log < blue_threshold)
     neg_gated <- neg[gate_filter, ]
+
     
     if (nrow(neg_gated) == 0) {
         stop("No data points remain after gating. Please adjust the gating thresholds.")
@@ -420,10 +421,10 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     
     blue_channel_normalized <- "Blue_Normalized"
     red_channel_normalized <- "Red_Normalized"
-    
-    neg_normalized <- neg
-    neg_normalized[[blue_channel_normalized]] <- neg$Blue_log
-    neg_normalized[[red_channel_normalized]] <- neg$Red_log
+
+    neg_normalized <- neg_gated
+    neg_normalized[[blue_channel_normalized]] <- neg_gated$Blue_log
+    neg_normalized[[red_channel_normalized]] <- neg_gated$Red_log
     
     dataset_list <- list()
     cellcount_total <- integer(length(samplefile))
