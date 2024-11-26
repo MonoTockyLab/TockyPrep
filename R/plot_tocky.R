@@ -73,6 +73,7 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
             sampledef <- x@sampledef$sampledef[x@sampledef$sampledef$file %in% selected_samples,]
         } else {
             data <- x@Data
+            sampledef <- x@sampledef$sampledef
         }
         
     }else{
