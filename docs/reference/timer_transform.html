@@ -9,7 +9,7 @@ and trigonometric transformation to the Blue and Red fluorescence data."><meta n
 
     <a class="navbar-brand me-2" href="../index.html">TockyPrep</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,8 @@ and trigonometric transformation to the Blue and Red fluorescence data.</p>
 <span>  interactive_gating <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  q <span class="op">=</span> <span class="fl">0.998</span>,</span>
-<span>  normalization <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  normalization <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  use_negative_control <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -119,6 +120,10 @@ Default is 0.998.</p></dd>
 <dd><p>Logical indicating whether to apply Timer fluorescence normalization.
 Default is `TRUE`.</p></dd>
 
+
+<dt id="arg-use-negative-control">use_negative_control<a class="anchor" aria-label="anchor" href="#arg-use-negative-control"></a></dt>
+<dd><p>Whether to use a negative control data to determine thresholds for Timer Blue and Timer Red, either by interactive mode or the quantile method. It is recommended to use the default `TRUE`.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -146,7 +151,7 @@ Default is `TRUE`.</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

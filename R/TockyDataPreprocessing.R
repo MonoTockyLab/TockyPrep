@@ -261,6 +261,7 @@ negfile = NULL, samplefile = NULL) {
 #'        Default is `MAD`. The alternative is `SD`.
 #' @param q Quantile value used for automatic Timer thresholds.
 #'        Default is 0.998.
+#' @param use_negative_control Whether to use a negative control data to determine thresholds for Timer Blue and Timer Red, either by interactive mode or the quantile method. It is recommended to use the default `TRUE`.
 #'
 #' @return The function returns a new TockyPrepData object containing:
 #'   \itemize{
@@ -277,14 +278,14 @@ negfile = NULL, samplefile = NULL) {
 #'   result <- timer_transform(prep_data)
 #' }
 #'
-#' @importFrom utils read.csv txtProgressBar setTxtProgressBar
+#' @importFrom utils read.csv txtProgressBar setTxtProgressBar tail askYesNo
 #' @importFrom grDevices rgb
 #' @importFrom methods new
 #' @importFrom graphics abline locator par
 #' @importFrom stats coef density lm sd quantile mad
 
 timer_transform <- function(prep, select = TRUE, blue_channel = NULL, red_channel = NULL, normalization_method = 'MAD',
-red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose = TRUE, q = 0.998, normalization = TRUE) {
+red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose = TRUE, q = 0.998, normalization = TRUE, use_negative_control = TRUE) {
     
     input_list <- list(
     path = prep$path,
@@ -389,16 +390,28 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
                 }
             }
         } else {
-            red_threshold <- quantile(neg$Red_log, q, na.rm = TRUE)
-            blue_threshold <- quantile(neg$Blue_log, q, na.rm = TRUE)
-            if (verbose) message("Automatic gating applied with thresholds at red_threshold =", red_threshold,
-            "and blue_threshold =", blue_threshold)
+            if(use_negative_control){
+                if(q >=0 & q <= 1){
+                    red_threshold <- quantile(neg$Red_log, q, na.rm = TRUE)
+                    blue_threshold <- quantile(neg$Blue_log, q, na.rm = TRUE)
+                    if (verbose) message("Automatic gating applied with thresholds at red_threshold =", red_threshold,
+                    "and blue_threshold =", blue_threshold)
+                }else{
+                    stop("use a q value between 0 and 1. \n")
+                }
+                
+            }else{
+                if(is.null(blue_threshold) && is.null(red_threshold)){
+                    stop("Specify blue_threshold and red_threhold or use interactive mode. \n")
+                }
+                
+            }
         }
     }
     
     gate_filter <- (neg$Red_log < red_threshold) & (neg$Blue_log < blue_threshold)
     neg_gated <- neg[gate_filter, ]
-
+    
     
     if (nrow(neg_gated) == 0) {
         stop("No data points remain after gating. Please adjust the gating thresholds.")
@@ -417,11 +430,9 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
         }
     }
     
-    
-    
     blue_channel_normalized <- "Blue_Normalized"
     red_channel_normalized <- "Red_Normalized"
-
+    
     neg_normalized <- neg_gated
     neg_normalized[[blue_channel_normalized]] <- neg_gated$Blue_log
     neg_normalized[[red_channel_normalized]] <- neg_gated$Red_log
@@ -493,12 +504,11 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     
     max_neg_blue <- max(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
     max_neg_red <- max(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
+    
     sd_blue <- sd(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
     sd_red <- sd(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
     MAD_blue <- mad(neg_normalized[[blue_channel_normalized]], na.rm = TRUE)
     MAD_red <- mad(neg_normalized[[red_channel_normalized]], na.rm = TRUE)
-    
-    
     
     for (sample_name in names(dataset_list)) {
         data_norm <- dataset_list[[sample_name]]
@@ -509,15 +519,28 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
             list(sdB = sd_blue, sdR = sd_red)
         }
         
-        norm_values <- process_fluorescence(
-        B = data_norm[[blue_channel_normalized]],
-        R = data_norm[[red_channel_normalized]],
-        maxB = max_neg_blue,
-        sdB = scale_parameters$sdB,
-        maxR = max_neg_red,
-        sdR = scale_parameters$sdR,
-        applyNormalization = normalization
-        )
+        if(use_negative_control){
+            norm_values <- process_fluorescence(
+            B = data_norm[[blue_channel_normalized]],
+            R = data_norm[[red_channel_normalized]],
+            maxB = max_neg_blue,
+            sdB = scale_parameters$sdB,
+            maxR = max_neg_red,
+            sdR = scale_parameters$sdR,
+            applyNormalization = normalization
+            )
+        }else{
+            norm_values <- process_fluorescence(
+            B = data_norm[[blue_channel_normalized]],
+            R = data_norm[[red_channel_normalized]],
+            maxB = blue_threshold,
+            sdB = scale_parameters$sdB,
+            maxR = red_threshold,
+            sdR = scale_parameters$sdR,
+            applyNormalization = normalization
+            )
+        }
+        
         
         data_norm[[blue_channel_normalized]] <- norm_values$Blue
         data_norm[[red_channel_normalized]] <- norm_values$Red
@@ -721,7 +744,6 @@ plot_timer_gating <- function(prep, x){
     red_channel <-  x@timer_fluorescence$original_red_channel
     neg <- read.csv(file.path(path, negfile), header = TRUE)
 
-    show(colnames(neg))
     required_channels <- c(blue_channel, red_channel)
     if (!all(required_channels %in% colnames(neg))) {
         stop("Not all required channels are present in the negative control data.")
@@ -737,7 +759,8 @@ plot_timer_gating <- function(prep, x){
     
     
     plot(neg$Red_log, neg$Blue_log, xlab='Timer Red (log)', ylab='Timer Blue (log)',
-    pch='.', col=rgb(0,0,0,alpha=0.2))
+    pch='.', col=rgb(0,0,0,alpha=0.2), xlim = c(min(neg$Red_log), max(neg$Red_log)*2), ylim = c(min(neg$Blue_log), max(neg$Blue_log)*2),
+    main = 'Timer Negative Control')
     
     abline(v = red_threshold, h = blue_threshold, col=2)
     
@@ -769,10 +792,9 @@ plot_timer_gating <- function(prep, x){
 #' @keywords internal
 #'
 #' @examples
-#' # Example usage:
-#' fluorescence_values <- c(0.5, 1, 2, 10)
+#' \dontrun{
 #' transformed_values <- LogSingleData(fluorescence_values)
-#' # transformed_values will be: c(0, 0, log10(2), log10(10))
+#' }
 LogSingleData <- function(x){
     x.log <- x
     lg <- x.log > 1
@@ -809,7 +831,8 @@ LogSingleData <- function(x){
 #' @examples
 #' \dontrun{
 #'   df <- data.frame(Red = rnorm(100, 50, 10), Blue = rnorm(100, 50, 10))
-#'   quadrant_data <- quadrant_gate(df, x_point = 50, y_point = 50, var_x_name = "Red", var_y_name = "Blue")
+#'   quadrant_data <- quadrant_gate(df, x_point = 50, y_point = 50,
+#'   var_x_name = "Red", var_y_name = "Blue")
 #' }
 quadrant_gate <- function(df, x_point, y_point, var_x_name, var_y_name) {
     x_col <- df[[var_x_name]]

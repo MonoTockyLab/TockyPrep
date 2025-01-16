@@ -150,6 +150,8 @@ plot_tocky <- function(x, file = 'PlotTocky', pseudocolour = TRUE, pdf = FALSE, 
         for (i in 1:min(16, length(plot_data))) {
             
             tpdata <- plot_data[[i]][, c(plotting_params$x_var, plotting_params$y_var)]
+            show(names(plot_data)[i])
+            show(dim(tpdata))
             colnames(tpdata) <- c('x', 'y')
             if (pseudocolour) {
                 density <- suppressWarnings(densCols(tpdata$x, tpdata$y, colramp = colorRampPalette(rev(rainbow(10, end = 4/6))))

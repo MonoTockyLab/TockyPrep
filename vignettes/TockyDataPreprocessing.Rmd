@@ -6,9 +6,10 @@ output: rmarkdown::html_vignette
 bibliography: TockyPrep.bib
 link-citations: TRUE
 vignette: >
+  %\VignetteEncoding{UTF-8}
   %\VignetteIndexEntry{TockyPrep: Data Preprocessing Methods for Flow Cytometric Fluorescent Timer Analysis}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+runtime: shiny
 ---
 
 
@@ -117,8 +118,8 @@ transformed_data <- sample_definition(transformed_data, sample_definition = samp
 
 Alternatively, sample grouping can be created by choosing interaction session using the option `interactive = TRUE`. This will prompt generation of sample_definition.csv in your output directory.
 
-```{r sample_definition2, include=FALSE, }
-#transformed_data <- sample_definition(transformed_data, output_dir = 'outuput', interactive = TRUE)
+```{r sample_definition2, include=FALSE}
+#transformed_data <- sample_definition(transformed_data, output_dir = 'output', interactive = TRUE)
 
 ```
 
@@ -172,6 +173,21 @@ Using the option `plot_mode = "Timer Angle and Intensity"`, you can visualize th
 # Visualizing the results
 plot_tocky(transformed_data, plot_mode = "Timer Angle and Intensity", interactive = FALSE, save = FALSE, n = 2, samplefile = samplefiles, verbose = FALSE)
 ```
+
+## Exploring Timer Data Transformation Parameters (Figure 4)
+Using the function `explore_timer_transform`, you can explore the parameter space by varying parameters for Timer fluorescence normalization and transformation.
+
+```{r explore_timer_transform, eval = FALSE, echo = TRUE}
+explore_timer_transform(prep, transformed_data)
+```
+
+This will activate a Shiny server, allowing you to experiment with changing Timer fluorescence thresholds and different normalization methods.
+
+```{r, out.width = "100%", echo = FALSE, fig.cap="Figure 4: Screenshot of the Shiny Demonstration for Exploring Timer Data Transformation Parameters."}
+knitr::include_graphics('assets/shiny.jpg')
+```
+
+
 
 # Conclusion
 
