@@ -23,6 +23,8 @@
 #' @slot input A list of parameters used for creating TockyPrepData object.
 #' @slot normalization_parameters A list of parameters used for data normalization.
 #' @slot Tocky A list containing other Tocky-specific analysis data.
+#' @slot metadata A list of annotation data
+#' @slot Transformation A list of parameters used for data transformation
 #'
 #' @keywords classes
 #' @export
@@ -36,7 +38,9 @@ setClass(
     timer_fluorescence = "list",
     input = "list",
     normalization_parameters = "list",
-    Tocky = "list"
+    Tocky = "list",
+    metadata = "list",
+    Transformation = "list"
   ),
   validity = function(object) {
     problems <- NULL
@@ -79,6 +83,8 @@ setClass(
 #' @param input A list of parameters used for creating TockyPrepData object.
 #' @param normalization_parameters A list of parameters used for data normalization.
 #' @param Tocky A list containing other Tocky-specific analysis data.
+#' @param metadata A list of annotation data
+#' @param Transformation A list of parameters used for data transformation
 #'
 #' @return A valid TockyPrepData that has been initialized with provided data.
 #' @keywords internal
@@ -92,7 +98,9 @@ setMethod("initialize", "TockyPrepData",
            timer_fluorescence = list(),
            input = list(),
            normalization_parameters = list(),
-           Tocky = list()) {
+           Tocky = list(),
+           metadata = list(),
+           Transformation = list()) {
     .Object@Data <- Data
     .Object@cell_counts <- cell_counts
     .Object@sampledef <- sampledef
@@ -100,6 +108,8 @@ setMethod("initialize", "TockyPrepData",
     .Object@input <- input
     .Object@normalization_parameters <- normalization_parameters
     .Object@Tocky <- Tocky
+    .Object@metadata <- metadata
+    .Object@Transformation <- Transformation
 
     validObject(.Object)
     return(.Object)
@@ -612,7 +622,7 @@ red_threshold = NULL, blue_threshold = NULL, interactive_gating = FALSE, verbose
     cell_counts = cell_counts,
     sampledef = sampledef,
     timer_fluorescence = timer_fluorescence,
-    input = input_list,
+    input = prep,
     normalization_parameters = normalization_parameters,
     Tocky = list())
     

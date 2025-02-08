@@ -1,6 +1,6 @@
 Package: TockyPrep
-Version: 0.1.2
-Date: 2025-01-16
+Version: 0.1.3
+Date: 2025-01-23
 Title: Data Preprocessing for Fluorescent Timer Reporters Using the Timer-Of-Cell-Kinetics-of-activitY (Tocky)
 Authors@R: c(person("Masahiro", "Ono", role = c("aut", "cre"),
                      email = "monotockylab@gmail.com", comment = c(OCRID="0000-0002-9284-7326")))
